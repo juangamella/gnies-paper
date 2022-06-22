@@ -38,6 +38,8 @@ import numpy as np
 import src.utils as utils
 import gc  # Garbage collector
 import time
+import os
+import pickle
 
 # --------------------------------------------------------------------
 # Parse input parameters
@@ -109,6 +111,10 @@ directory = "synthetic_experiments/dataset_%d%s/" % (time.time(),
 if args.cluster:
     directory = "/cluster/scratch/gajuan/" + directory
 
+os.makedirs(directory)
+print('Storing results in "%s"' % directory)
+
+
 int_types = {'noise': 'noise_interventions',
              'shift': 'shift_interventions',
              'do': 'do_interventions'}
@@ -134,16 +140,30 @@ for i in range(args.G):
     # interventions = [{int_types[args.i_type]: None}] if args.n_obs is not None else []
     interventions = []
     K = args.envs  # - len(interventions)  # number of "interventional" environments
-    all_targets = gen.intervention_targets(args.p, K, args.i_size, random_state=args.seed + i)
+    all_targets = gen.intervention_targets(
+        args.p, K, args.i_size, replace=False, random_state=args.seed + i)
     for env_targets in all_targets:
         intervention = {int_types[args.i_type]:
                         dict((target, (int_mean(), int_var())) for target in env_targets)}
         interventions.append(intervention)
     test_cases.append((scm, interventions))
 
+# Save test cases for analysis
+Ns = [int(n) for n in args.n.split(',')]
+to_save = {'n_cases': len(test_cases),
+           'runs': args.runs,
+           'Ns': Ns,
+           'args': args,
+           'cases': test_cases}
+filename = directory + 'test_cases.pickle'
+with open(filename, 'wb') as f:
+    pickle.dump(to_save, f)
+    print('\nSaved test cases + info to "%s"' % filename)
+
+
 # Sample data for each run
 
-Ns = [int(n) for n in args.n.split(',')]
+
 # obs_Ns = None if args.n_obs is None else [int(n) for n in args.n_obs.split('i')]
 # assert (obs_Ns is None or len(Ns) == len(obs_Ns))
 
