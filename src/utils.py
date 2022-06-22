@@ -38,14 +38,42 @@
 import pickle
 import os
 import numpy as np
-import sempler
-import sempler.generators
 import pandas as pd
 
-import itertools
+# --------------------------------------------------------------------
+# Definitions
+
+INFO_FILENAME = 'test_cases.pickle'
+
 
 # --------------------------------------------------------------------
 # Auxiliary functions
+
+def test_case_filename(n, graph, run):
+    return 'test_case_n:%d_g:%d_r:%d' % (n, graph, run)
+
+
+def result_filename(method, n, graph, run):
+    return "result_%s_n:%d_g:%d_r:%d.pickle" % (method, n, graph, run)
+
+
+def compiled_results_filename(method):
+    return "compiled_results_%s.pickle" % method
+
+
+def write_pickle(filename, data):
+    with open(filename, 'wb') as f:
+        pickle.dump(data, f)
+
+
+def read_pickle(filename):
+    if os.path.getsize(filename) > 0:
+        with open(filename, "rb") as f:
+            return pickle.load(f)
+
+
+def load_bin(path):
+    return np.load(path + '.npy', allow_pickle=False)
 
 
 def data_to_csv(data, path, debug):
@@ -136,7 +164,6 @@ def compile_results(directory, clean=False):
 
     # Save compiled results
     filename = directory + '/' + 'compiled_results.pickle'
-    with open(filename, 'wb') as f:
-        pickle.dump((namespace, test_cases, results), f)
+    write_pickle(filename, (namespace, test_cases, results))
     print('\nWrote compiled results to "%s"' % filename)
     return filename

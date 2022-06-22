@@ -155,7 +155,7 @@ to_save = {'n_cases': len(test_cases),
            'Ns': Ns,
            'args': args,
            'cases': test_cases}
-filename = directory + 'test_cases.pickle'
+filename = directory + utils.INFO_FILENAME
 with open(filename, 'wb') as f:
     pickle.dump(to_save, f)
     print('\nSaved test cases + info to "%s"' % filename)
@@ -166,10 +166,6 @@ with open(filename, 'wb') as f:
 
 # obs_Ns = None if args.n_obs is None else [int(n) for n in args.n_obs.split('i')]
 # assert (obs_Ns is None or len(Ns) == len(obs_Ns))
-
-
-def filename(n, graph, run):
-    return 'test_case_n:%d_g:%d_r:%d' % (n, graph, run)
 
 
 for n in Ns:
@@ -191,7 +187,7 @@ for n in Ns:
             for intervention in interventions:
                 data += [scm.sample(n, **intervention, random_state=j)]
             # Save the data to file
-            path = directory + filename(n, i, j)
+            path = directory + utils.test_case_filename(n, i, j)
             utils.data_to_bin(data, path, debug=args.debug)
             del data
             gc.collect()
