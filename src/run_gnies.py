@@ -203,7 +203,8 @@ def process_results():
         results['history'] = history
     path = args.directory + utils.compiled_results_filename(METHOD_NAME)
     utils.write_pickle(path, results)
-    print('\nRead %d/%d results - %d/%d results were an exception' % (read, count, failed, count))
+    print('\nProcessed %d/%d - read %d/%d results - %d/%d results were an exception' %
+          (count, n_samples, read, count, failed, count))
     print('Wrote compiled results to "%s"' % path)
 
 

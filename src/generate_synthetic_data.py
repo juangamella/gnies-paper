@@ -112,7 +112,6 @@ if args.cluster:
     directory = "/cluster/scratch/gajuan/" + directory
 
 os.makedirs(directory)
-print('Storing results in "%s"' % directory)
 
 
 int_types = {'noise': 'noise_interventions',
@@ -192,3 +191,5 @@ for n in Ns:
             del data
             gc.collect()
         print()
+
+print('Stored dataset in "%s"' % directory)
