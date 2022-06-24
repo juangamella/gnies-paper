@@ -70,6 +70,9 @@ arguments = {
     'fit_intercept': {'default': False, 'type': bool},
     'ges_one_run': {'default': False, 'type': bool},
     'ges_phases': {'default': 'fbt', 'type': str},
+    'lambda_lo': {'default': 0.5, 'type': float},
+    'lambda_hi': {'default': 0.5, 'type': float},
+    'lambda_delta': {'default': 1e-3, 'type': float},
     'gnies_verbose': {'default': False, 'type': bool},
     'store_history': {'default': False, 'type': bool},
 }
@@ -133,10 +136,12 @@ print("Running GnIES with settings:")
 print(" ", gnies_options)
 
 
-def run_gnies(n, case, run, debug=False):
+def run_gnies(lmbda, n, case, run, debug=False):
     # Load data
     data_path = args.directory + utils.test_case_filename(n, case, run)
     data = utils.load_bin(data_path)
+    N = sum([len(X) for X in data])
+    lmbda = lmbda * np.log(N)
     # Run method
     start = time.time()
     score, estimated_icpdag, estimated_I, history = gnies.fit(data, **gnies_options)
