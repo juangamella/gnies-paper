@@ -53,12 +53,12 @@ def test_case_filename(n, graph, run):
     return 'test_case_n:%d_g:%d_r:%d' % (n, graph, run)
 
 
-def result_filename(method, n, graph, run):
-    return "result_%s_n:%d_g:%d_r:%d.pickle" % (method, n, graph, run)
+def result_filename(method, case_info):
+    return "result_%s%s.pickle" % (method, serialize_dict(case_info))
 
 
-def compiled_results_filename(method):
-    return "compiled_results_%s.pickle" % method
+def compiled_results_filename(method, param_string):
+    return "compiled_results_%s%s.pickle" % (method, param_string)
 
 
 def write_pickle(filename, data):
@@ -76,9 +76,21 @@ def load_bin(path):
     return np.load(path + '.npy', allow_pickle=False)
 
 
+def hyperparameter_range(lo, hi, num):
+    if hi < lo:
+        raise ValueError("Upper bound < lower bound !")
+    elif hi == lo:
+        return np.array([hi])
+    else:
+        return np.linspace(lo, hi, num)
+
+
+
 def data_to_csv(data, path, debug):
-    """Save the multienvironment data in a csv file ready to be used by the R script that runs ICP"""
-    # Combine the data into a single matrix with an extra column indicating the environment
+    """Save the multienvironment data in a csv file ready to be used by
+    the R script that runs ICP"""
+    # Combine the data into a single matrix with an extra column
+    # indicating the environment
     flattened = []
     for e, X in enumerate(data):
         flagged = np.hstack([np.ones((len(X), 1)) * e, X])
@@ -111,11 +123,10 @@ def data_to_bin(data, path, debug):
     np.save(path, data)
 
 
-def parameter_string(args, excluded_keys):
-    """Convert a Namespace object (from argparse) into a string, excluding
-    some keys, to use as filename or dataset name"""
+def serialize_dict(dictionary, excluded_keys=[]):
+    """Serialize a dictionary into a string."""
     string = ""
-    for k, v in vars(args).items():
+    for k, v in dictionary.items():
         if isinstance(v, bool):
             value = str(int(v))
         else:
@@ -124,6 +135,12 @@ def parameter_string(args, excluded_keys):
         if k not in excluded_keys:
             string = string + "_" + k + ":" + value
     return string
+
+
+def parameter_string(args, excluded_keys):
+    """Convert a Namespace object (from argparse) into a string, excluding
+    some keys, to use as filename or dataset name"""
+    return serialize_dict(vars(args), excluded_keys)
 
 # --------------------------------------------------------------------
 # Process results
