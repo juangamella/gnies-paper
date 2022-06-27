@@ -48,7 +48,7 @@ METHOD_NAME = 'gnies'
 # --------------------------------------------------------------------
 # Auxiliary functions
 if __name__ != '__main__':
-    msg = "Not running as a script, i.e. python -m package.module"
+    msg = "run_gnies.py should be run as a python script, e.g.\npython -m ut_lvce.comparison_experiments <args>."
     raise Exception(msg)
 
 # --------------------------------------------------------------------
@@ -65,7 +65,6 @@ arguments = {
     'n_workers': {'default': 1, 'type': int},
     'debug': {'default': False, 'type': bool},
     'chunksize': {'type': int, 'default': 1},
-    'compile_only': {'type': bool, 'default': False},
     # GnIES parameters
     'backward_phase': {'default': False, 'type': bool},
     'fit_intercept': {'default': False, 'type': bool},
@@ -73,7 +72,7 @@ arguments = {
     'ges_phases': {'default': 'fbt', 'type': str},
     'lambda_lo': {'default': 0.5, 'type': float},
     'lambda_hi': {'default': 0.5, 'type': float},
-    'n_lambdas': {'default': 1, 'type': int},
+    'lambda_delta': {'default': 1e-3, 'type': float},
     'gnies_verbose': {'default': False, 'type': bool},
     'store_history': {'default': False, 'type': bool},
 }
@@ -95,15 +94,6 @@ for name, params in arguments.items():
 args = parser.parse_args()
 print(args)  # For debugging
 
-excluded_keys = [
-    'store_history',
-    'gnies_verbose',
-    'directory',
-    'chunksize',
-    'n_workers',
-    'compile_only'
-]
-excluded_keys += [] if args.ges_one_run else ['ges_one_run']
 
 # --------------------------------------------------------------------
 # Run algorithm on samples
@@ -117,42 +107,12 @@ n_cases, runs, Ns, p = info['n_cases'], info['runs'], info['Ns'], info['args'].p
 n_samples = n_cases * runs * len(Ns)
 print("Dataset contains a total of %d samples from %d cases at sample sizes %s for %d runs" %
       (n_samples, n_cases, Ns, runs))
+# Build iterable
+iterable = gnies.utils.cartesian([Ns, range(n_cases), range(runs)], dtype=int)
+# print(iterable)
+assert len(iterable) == n_samples
 
-# --------------------------------------------------------------------
-
-# ---------------------------------------------------------------------
-# Build iterable, result_matrix_shape, iterable entry to index function
-
-lmbdas = utils.hyperparameter_range(args.lambda_lo,
-                                    args.lambda_hi,
-                                    args.n_lambdas)
-fields = [range(n_cases), lmbdas, Ns, range(runs)]
-
-iterable = []
-for (graph, lmbda, sample_size, run) in gnies.utils.cartesian(fields, dtype=object):
-    iterable.append({'l': lmbda,
-                     'n': sample_size,
-                     'g': graph,
-                     'r': run})
-assert len(iterable) == n_samples * len(lmbdas)
-
-# NOTE!!!: The case must be the first index (to easily recover ground
-# truth when computing metrics)
-
-result_matrix_shape = tuple(len(field) for field in fields)
-
-Ns_idx = dict(zip(sorted(Ns), range(len(Ns))))
-lambdas_idx = dict(zip(sorted(lmbdas), range(len(lmbdas))))
-
-
-def case_info_to_indices(info):
-    lmbda = info['l']
-    n = info['n']
-    return (info['g'], lambdas_idx[lmbda], Ns_idx[n], info['r'])
-
-
-# ------------------
-# Code to run method
+# Code to run GnIES
 ges_phases = []
 for symbol in args.ges_phases:
     if symbol == 'f':
@@ -174,26 +134,21 @@ gnies_options = {'backward_phase': args.backward_phase,
 
 print("Running GnIES with settings:")
 print(" ", gnies_options)
-print("  on lambdas :", lmbdas)
 
 
-def run_method(info, debug=False):
-    """Takes an iterable entry and runs the algorithm accordingly"""
+def run_gnies(lmbda, n, case, run, debug=False):
     # Load data
-    n, graph, run = info['n'], info['g'], info['r']
-    data_path = args.directory + utils.test_case_filename(n, graph, run)
+    data_path = args.directory + utils.test_case_filename(n, case, run)
     data = utils.load_bin(data_path)
-    # Compute penalization parameter
     N = sum([len(X) for X in data])
-    lmbda = info['l'] * np.log(N)
+    lmbda = lmbda * np.log(N)
     # Run method
     start = time.time()
-    output = gnies.fit(data, ges_lambda=lmbda, **gnies_options)
+    score, estimated_icpdag, estimated_I, history = gnies.fit(data, **gnies_options)
     elapsed = time.time() - start
-    print("  Ran GnIES on test case %s in %0.2f seconds." %
-          (utils.serialize_dict(info), elapsed))
+    print("  Ran GnIES on test case n:%d_g:%d_r:%d in %0.2f seconds." %
+          (n, case, run, elapsed))
     # Store results
-    score, estimated_icpdag, estimated_I, history = output
     result = {'estimate': estimated_icpdag,
               'estimated_I': estimated_I,
               'score': score,
@@ -202,28 +157,25 @@ def run_method(info, debug=False):
         result['history'] = history
     return result
 
-# ---------------
-# Process results
-
 
 def process_results():
     print("Processing results:\n")
     # Common to all methods
-    estimates = np.empty(result_matrix_shape, dtype=object)
-    I_estimates = np.empty(result_matrix_shape, dtype=object)
-    times = np.empty(result_matrix_shape, dtype=float)
-    # ------------------
-    # Exclusive to GnIES
-    scores = np.empty(result_matrix_shape, dtype=float)
+    estimates = np.empty((len(Ns), n_cases, runs, p, p), dtype=int)
+    size = (len(Ns), n_cases, runs)
+    I_estimates = np.empty(size, dtype=object)
+    times = np.empty(size, dtype=float)
+    # For GnIES
+    scores = np.empty(size, dtype=float)
     if args.store_history:
-        history = np.empty(result_matrix_shape, dtype=object)
-    # ------------------
+        history = np.empty(size, dtype=object)
 
     # Iterate through all results, storing results in the above arrays
+    Ns_idx = dict(zip(sorted(Ns), range(len(Ns))))
     count, read, failed = 0, 0, 0
-    for case_info in iterable:
+    for (n, case, run) in iterable:
         count += 1
-        filename = utils.result_filename(METHOD_NAME, case_info)
+        filename = utils.result_filename(METHOD_NAME, n, case, run)
         print('  processing "%s"' % filename)
         # Load the result
         try:
@@ -238,70 +190,70 @@ def process_results():
             print('    WARNING - test case resulted in exception:', result)
             failed += 1
         else:
-            # Store results into arrays
-            idx = case_info_to_indices(case_info)
-            # Common results
-            estimates[idx] = result['estimate']
-            I_estimates[idx] = result['estimated_I']
-            times[idx] = result['elapsed']
-            # ------------------
-            # Exclusive to GnIES
-            scores[idx] = result['score']
+            i = Ns_idx[n]
+            estimates[i, case, run, :, :] = result['estimate']
+            I_estimates[i, case, run] = result['estimated_I']
+            times[i, case, run] = result['elapsed']
+            scores[i, case, run] = result['score']
             if args.store_history:
-                history[idx] = result['history']
-            # ------------------
+                history[i, case, run] = result['history']
             print("  done")
 
     # Store compiled results
     results = {'estimates': estimates,
                'I_estimates': I_estimates,
-               'times': times}
-    # ------------------
-    # Exclusive to GnIES
-    results['scores'] = scores
+               'times': times,
+               'scores': scores}
     if args.store_history:
         results['history'] = history
-    # ------------------
     path = args.directory + utils.compiled_results_filename(METHOD_NAME)
-    utils.write_pickle(path, (args, results))
+    utils.write_pickle(path, results)
     print('\nProcessed %d/%d - read %d/%d results - %d/%d results were an exception' %
           (count, n_samples, read, count, failed, count))
     print('Wrote compiled results to "%s"' % path)
 
 
-# --------------------------------------------------------------------
-# Execute experiments
-
-def worker(case_info):
+def worker(case_tuple):
+    n, case, run = case_tuple
     # Run method
     try:
-        result = run_method(case_info, debug=args.debug)
+        result = run_gnies(n, case, run, debug=args.debug)
     except Exception as e:
         trace = traceback.format_exc()
         print("ERROR:", trace)
         result = (e, trace)
-    filename = utils.result_filename(METHOD_NAME, case_info)
-    utils.write_pickle(args.directory + filename, result)
-    print("    Stored result in", filename) if args.debug else None
+    path = args.directory + utils.result_filename(METHOD_NAME, n, case, run)
+    utils.write_pickle(path, result)
+    print("    Stored result in", path) if args.debug else None
 
-    
-if not args.compile_only:
-    n_workers = os.cpu_count() - 1 if args.n_workers == -1 else args.n_workers
-    print("\n\nBeginning experiments with %d workers on %d cases at %s\n\n" %
-          (n_workers, n_samples, datetime.now()))
-    start = time.time()
-    if n_workers == 1:
-        # Without multiprocessing, i.e. map function runs sequentially
-        print("Running experiments sequentially")
-        list(map(worker, iterable))
-    else:
-        # Or in parallel on a pool of n_workers
-        print("Running experiments in parallel")
-        with multiprocessing.Pool(n_workers) as pool:
-            pool.map(worker, iterable, chunksize=args.chunksize)
 
-    end = time.time()
-    print("\n\nFinished experiments at %s (elapsed %0.2f seconds)\n\n" %
-          (datetime.now(), end - start))
+n_workers = os.cpu_count() - 1 if args.n_workers == -1 else args.n_workers
+print("\n\nBeginning experiments with %d workers on %d cases at %s\n\n" %
+      (n_workers, n_samples, datetime.now()))
+start = time.time()
+if n_workers == 1:
+    # Without multiprocessing, i.e. map function runs sequentially
+    print("Running experiments sequentially")
+    list(map(worker, iterable))
+else:
+    # Or in parallel on a pool of n_workers
+    print("Running experiments in parallel")
+    with multiprocessing.Pool(n_workers) as pool:
+        pool.map(worker, iterable, chunksize=args.chunksize)
+
+end = time.time()
+print("\n\nFinished experiments at %s (elapsed %0.2f seconds)\n\n" %
+      (datetime.now(), end - start))
 
 process_results()
+
+# --------------------------------------------------------------------
+# Process results
+
+# Extract estimates
+
+# # Save arguments, test cases and compiled results
+# filename = args.directory + 'compiled_results_gnies.pickle'
+# with open(filename, 'wb') as f:
+#     pickle.dump((args, test_cases, results), f)
+#     print('\nWrote compiled results to "%s"' % filename)

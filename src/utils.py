@@ -57,8 +57,8 @@ def result_filename(method, case_info):
     return "result_%s%s.pickle" % (method, serialize_dict(case_info))
 
 
-def compiled_results_filename(method, param_string):
-    return "compiled_results_%s%s.pickle" % (method, param_string)
+def compiled_results_filename(method):
+    return "compiled_results_%s.pickle" % method
 
 
 def write_pickle(filename, data):
