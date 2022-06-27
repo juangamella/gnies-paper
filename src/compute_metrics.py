@@ -104,7 +104,7 @@ for i, (scm, interventions) in enumerate(info['cases']):
     ground_truth[i] = true_class
     print("    done.\n")
 
-#assert not np.any(ground_truth == None)
+# assert not np.any(ground_truth == None)
 
 # Build arrays to store metrics
 shape = (len(Ns), n_cases, runs)
@@ -115,33 +115,24 @@ for metric in use_metrics:
 
 print("---------------------------------------------")
 for method in methods:
-    args, results = utils.read_pickle(args.directory + utils.compiled_results_filename(method))
+    args, results = utils.read_pickle(
+        args.directory + utils.compiled_results_filename(method))
     print("Computing metrics for method = %s" % method)
     print("   which was run with settings")
     print("     ", args)
     # Load estimates from the method
-    # Use the elapsed time as indicator of the shape
-    # Build estimated classes
-    print("  building estimated classes")
     estimates = results['estimates']
-    estimated_classes = np.empty_like(estimates, dtype=object)
-    # TODO: Continue here, when reshaping everything goes havoc
+    # Compute the metrics for each test case
+    computed_metrics = dict((metric, np.empty_like(
+        estimates, dtype=float)) for metric in use_metrics)
     for i, case_estimates in enumerate(estimates):
-        case_estimated_classes = np.array([list(gnies.utils.all_dags(estimate)) for estimate in case_estimates.flatten()],
-                                          dtype=object)
-        print(case_estimated_classes)
-        print(case_estimates.shape)
-        estimated_classes[i] = np.reshape(case_estimated_classes, case_estimates.shape)
-    print(estimated_classes)
-    # Compute metrics
-    print("  computing metrics")
-    for metric in use_metrics:
-        print("    metric :", metric)
-        print("      ", end="")
-        computed_metric = np.zeros_like(estimated_classes, dtype=float)
-        for i, case_classes in enumerate(estimated_classes):
-            computed_metric[i] = np.vectorize(metric)(case_classes, ground_truth[i])
-        metrics[metric][method] = computed_metric
-        print(" done.")
+        estimated_classes = [gnies.utils.all_dags(
+            estimate) for estimate in case_estimates.flatten()]
+        for metric in use_metrics:
+            case_result = [metric(estimated_class, ground_truth[i])
+                           for estimated_class in estimated_classes]
+            computed_metrics[metric][i] = np.reshape(
+                case_result, computed_metrics[metric][i].shape)
+    print(computed_metrics)
 
 # print(metrics)
