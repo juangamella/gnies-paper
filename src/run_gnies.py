@@ -284,11 +284,11 @@ def worker(case_info):
     utils.write_pickle(args.directory + filename, result)
     print("    Stored result in", filename) if args.debug else None
 
-    
+
 if not args.compile_only:
     n_workers = os.cpu_count() - 1 if args.n_workers == -1 else args.n_workers
-    print("\n\nBeginning experiments with %d workers on %d cases at %s\n\n" %
-          (n_workers, n_samples, datetime.now()))
+    print("\n\nBeginning execution of %d experiments with %d workers at %s\n\n" %
+          (len(iterable), n_workers, datetime.now()))
     start = time.time()
     if n_workers == 1:
         # Without multiprocessing, i.e. map function runs sequentially

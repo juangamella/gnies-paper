@@ -65,17 +65,13 @@ def type_2_structc(estimated_class, true_class):
 def type_1_I(estimate, truth):
     """~ type 1 error: i.e. how many of the elements in the estimated I
     are not in the true I."""
-    (_, est_I) = estimate
-    (_, true_I) = truth
-    return _dist_sets(est_I, true_I)
+    return _dist_sets(estimate, truth)
 
 
 def type_2_I(estimate, truth):
     """~ type 2 error: i.e. how many of the elements in the true I were
     not in the estimated I."""
-    (_, est_I) = estimate
-    (_, true_I) = truth
-    return _dist_sets(true_I, est_I)
+    return _dist_sets(truth, estimate)
 
 
 def type_1_parents(estimate, truth):

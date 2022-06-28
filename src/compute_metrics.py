@@ -44,7 +44,12 @@ import pickle
 import src.metrics as metrics
 
 # --------------------------------------------------------------------
+# Auxiliary functions
+
+
+# --------------------------------------------------------------------
 # Parse input parameters
+
 
 # Definitions and default settings
 arguments = {
@@ -77,62 +82,92 @@ print(args)  # For debugging
 
 # --------------------------------------------------------------------
 # Compute metrics
-
-use_metrics = [metrics.type_1_structc, metrics.type_2_structc]
 methods = args.methods.split(',')
 
 # Extract dataset information
 info = utils.read_pickle(args.directory + utils.INFO_FILENAME)
-n_cases, runs, Ns = info['n_cases'], info['runs'], info['Ns']
-Ns_idx = dict(zip(sorted(Ns), range(len(Ns))))
+n_cases = info['n_cases']
 
 # Build ground truths
 print("---------------------------------------------")
 print("Building ground truths\n")
-size = (len(Ns), n_cases, runs)
-ground_truth = np.empty(n_cases, dtype=object)
+ground_truth_classes = np.empty(n_cases, dtype=object)
+ground_truth_skeletons = np.empty(n_cases, dtype=object)
+ground_truth_Is = np.empty(n_cases, dtype=object)
+ground_truth_dags = np.empty(n_cases, dtype=object)
 for i, (scm, interventions) in enumerate(info['cases']):
     print("  case %d" % i)
     print("    interventions :", interventions)
+    # Extract union of intervention targets
     union = set()
+    # Note: interventions are [{intervention_type: {target: (mean, variance)}*}]
     for intervention in interventions:
         parameters = list(intervention.values())[0]
         union |= set(list(parameters.keys()))
     print("    union of targets :", union)
-    true_class = gnies.utils.imec(scm.W, union)
+    ground_truth_Is[i] = union
+    # Extract true DAG
+    dag = (scm.W != 0).astype(int)
+    ground_truth_dags[i] = dag
+    # Compute true equivalence class
+    true_class = gnies.utils.imec(dag, union)
     print("    %d DAGs in the true equiv. class" % len(true_class))
-    ground_truth[i] = true_class
+    ground_truth_classes[i] = true_class
+    # Compute skeleton of equiv. graphs
+    ground_truth_skeletons[i] = gnies.utils.skeleton(dag)
     print("    done.\n")
 
-# assert not np.any(ground_truth == None)
+ground_truths = {'skeletons': ground_truth_skeletons,
+                 'classes': ground_truth_classes,
+                 'dags': ground_truth_dags,
+                 'Is': ground_truth_Is}
 
-# Build arrays to store metrics
-shape = (len(Ns), n_cases, runs)
-metrics = {}
-for metric in use_metrics:
-    metrics[metric] = {}
-
+computed_metrics = {}
 
 print("---------------------------------------------")
+print("Computing metrics")
+
 for method in methods:
+    # Read the method's result file
     args, results = utils.read_pickle(
         args.directory + utils.compiled_results_filename(method))
-    print("Computing metrics for method = %s" % method)
-    print("   which was run with settings")
-    print("     ", args)
-    # Load estimates from the method
-    estimates = results['estimates']
-    # Compute the metrics for each test case
-    computed_metrics = dict((metric, np.empty_like(
-        estimates, dtype=float)) for metric in use_metrics)
-    for i, case_estimates in enumerate(estimates):
-        estimated_classes = [gnies.utils.all_dags(
-            estimate) for estimate in case_estimates.flatten()]
-        for metric in use_metrics:
-            case_result = [metric(estimated_class, ground_truth[i])
-                           for estimated_class in estimated_classes]
-            computed_metrics[metric][i] = np.reshape(
-                case_result, computed_metrics[metric][i].shape)
-    print(computed_metrics)
+    print("\n  method = %s" % method)
+    print("     which was run with settings")
+    print("       ", args)
+    # Load necessary estimates from the method
+    estimates = results['estimates']  # I-CPDAGs
+    I_estimates = results['I_estimates']  # Sets of intervention targets
+    method_metrics = {}  # results dictionary
+    # ---------------------
+    # Compute t1/t2 class metrics
+    print("    computing class metrics")
+    funs = [metrics.type_1_structc, metrics.type_2_structc]
+    class_metrics = utils.compute_metrics(
+        estimates, ground_truth_classes, funs, gnies.utils.all_dags)
+    method_metrics.update(class_metrics)
+    # -------------------------
+    # Compute skeleton recovery
+    print("    computing skeleton metrics")
+    funs = [metrics.type_1_skeleton, metrics.type_1_skeleton]
+    skeleton_metrics = utils.compute_metrics(
+        estimates, ground_truth_skeletons, funs, gnies.utils.skeleton)
+    method_metrics.update(skeleton_metrics)
+    # ------------------------------------
+    # Compute intervention target recovery
+    print("    computing intervention target metrics")
+    funs = [metrics.type_1_I, metrics.type_2_I]
+    I_metrics = utils.compute_metrics(
+        I_estimates, ground_truth_Is, funs, lambda I: I)
+    method_metrics.update(I_metrics)
+    # -----------------------------
+    # Compute elapsed times metrics
+    print("    computing elapsed time")
+    method_metrics['times'] = results['times']
+    # Store results for this method
+    computed_metrics[method] = method_metrics
 
-# print(metrics)
+print("Done.")
+
+path = args.directory + 'metrics.pickle'  # % time.time()
+print("Saved results to", path)
+utils.write_pickle(path, (ground_truths, computed_metrics))
