@@ -148,7 +148,7 @@ for method in methods:
     # -------------------------
     # Compute skeleton recovery
     print("    computing skeleton metrics")
-    funs = [metrics.type_1_skeleton, metrics.type_1_skeleton]
+    funs = [metrics.type_1_skeleton, metrics.type_2_skeleton]
     skeleton_metrics = utils.compute_metrics(
         estimates, ground_truth_skeletons, funs, gnies.utils.skeleton)
     method_metrics.update(skeleton_metrics)

@@ -169,7 +169,7 @@ gnies_options = {'backward_phase': args.backward_phase,
                  'centered': not args.fit_intercept,
                  'ges_iterate': not args.ges_one_run,
                  'ges_phases': ges_phases,
-                 'debug': args.gnies_verbose
+                 'debug': args.gnies_verbose,
                  }
 
 print("Running GnIES with settings:")
@@ -191,11 +191,13 @@ def run_method(info, debug=False):
     output = gnies.fit(data, ges_lambda=lmbda, **gnies_options)
     elapsed = time.time() - start
     print("  Ran GnIES on test case %s in %0.2f seconds." %
-          (utils.serialize_dict(info), elapsed))
+          (utils.serialize_dict(info), elapsed)) if debug else None
     # Store results
     score, estimated_icpdag, estimated_I, history = output
     result = {'estimate': estimated_icpdag,
               'estimated_I': estimated_I,
+              'lambda': lmbda,
+              'n': n,
               'score': score,
               'elapsed': elapsed}
     if args.store_history:
@@ -263,7 +265,7 @@ def process_results():
         results['history'] = history
     # ------------------
     path = args.directory + utils.compiled_results_filename(METHOD_NAME)
-    utils.write_pickle(path, (args, results))
+    utils.write_pickle(path, ((args, gnies_options, lmbdas, Ns), results))
     print('\nProcessed %d/%d - read %d/%d results - %d/%d results were an exception' %
           (count, n_samples, read, count, failed, count))
     print('Wrote compiled results to "%s"' % path)
