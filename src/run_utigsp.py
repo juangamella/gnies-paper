@@ -42,8 +42,9 @@ import multiprocessing
 import gnies.utils
 import src.utils as utils
 import traceback
+import src.ut_igsp as ut_igsp
 
-METHOD_NAME = 'gnies'
+METHOD_NAME = 'ut_igsp'
 
 # --------------------------------------------------------------------
 # Auxiliary functions
@@ -67,15 +68,12 @@ arguments = {
     'chunksize': {'type': int, 'default': 1},
     'compile_only': {'type': bool, 'default': False},
     # GnIES parameters
-    'backward_phase': {'default': False, 'type': bool},
-    'fit_intercept': {'default': False, 'type': bool},
-    'ges_one_run': {'default': False, 'type': bool},
-    'ges_phases': {'default': 'fbt', 'type': str},
-    'lambda_lo': {'default': 0.5, 'type': float},
-    'lambda_hi': {'default': 0.5, 'type': float},
-    'n_lambdas': {'default': 1, 'type': int},
-    'gnies_verbose': {'default': False, 'type': bool},
-    'store_history': {'default': False, 'type': bool},
+    'alpha_lo': {'default': 0.5, 'type': float},
+    'alpha_hi': {'default': 0.5, 'type': float},
+    'n_alphas': {'default': 1, 'type': int},
+    'beta_lo': {'default': 0.5, 'type': float},
+    'beta_hi': {'default': 0.5, 'type': float},
+    'n_betas': {'default': 1, 'type': int},
 }
 
 # Parse settings from input
@@ -96,8 +94,6 @@ args = parser.parse_args()
 print(args)  # For debugging
 
 excluded_keys = [
-    'store_history',
-    'gnies_verbose',
     'directory',
     'chunksize',
     'n_workers',
@@ -123,18 +119,25 @@ print("Dataset contains a total of %d samples from %d cases at sample sizes %s f
 # ---------------------------------------------------------------------
 # Build iterable, result_matrix_shape, iterable entry to index function
 
-lmbdas = utils.hyperparameter_range(args.lambda_lo,
-                                    args.lambda_hi,
-                                    args.n_lambdas)
-fields = [range(n_cases), lmbdas, Ns, range(runs)]
+# Significance level for CI tests
+alphas = utils.hyperparameter_range(args.alpha_lo,
+                                    args.alpha_hi,
+                                    args.n_alphas)
+
+# Significance level for invariance tests
+betas = utils.hyperparameter_range(args.beta_lo,
+                                   args.beta_hi,
+                                   args.n_betas)
+fields = [range(n_cases), alphas, betas, Ns, range(runs)]
 
 iterable = []
-for (graph, lmbda, sample_size, run) in gnies.utils.cartesian(fields, dtype=object):
-    iterable.append({'l': lmbda,
+for (graph, alpha, beta, sample_size, run) in gnies.utils.cartesian(fields, dtype=object):
+    iterable.append({'a': alpha,
+                     'b': beta,
                      'n': sample_size,
                      'g': graph,
                      'r': run})
-assert len(iterable) == n_samples * len(lmbdas)
+assert len(iterable) == n_samples * len(alphas) * len(betas)
 
 # NOTE!!!: The case must be the first index (to easily recover ground
 # truth when computing metrics)
@@ -142,39 +145,23 @@ assert len(iterable) == n_samples * len(lmbdas)
 result_matrix_shape = tuple(len(field) for field in fields)
 
 Ns_idx = dict(zip(sorted(Ns), range(len(Ns))))
-lambdas_idx = dict(zip(sorted(lmbdas), range(len(lmbdas))))
+alphas_idx = dict(zip(sorted(alphas), range(len(alphas))))
+betas_idx = dict(zip(sorted(betas), range(len(betas))))
 
 
 def case_info_to_indices(info):
-    lmbda = info['l']
+    alpha = info['a']
+    beta = info['b']
     n = info['n']
-    return (info['g'], lambdas_idx[lmbda], Ns_idx[n], info['r'])
+    return (info['g'], alphas_idx[alpha], betas_idx[beta], Ns_idx[n], info['r'])
 
 
 # ------------------
 # Code to run method
-ges_phases = []
-for symbol in args.ges_phases:
-    if symbol == 'f':
-        ges_phases.append('forward')
-    elif symbol == 'b':
-        ges_phases.append('backward')
-    elif symbol == 't':
-        ges_phases.append('turning')
-    else:
-        raise ValueError('Invalid symbol "%s" in args.ges_phases ("%s").' %
-                         (symbol, args.ges_phases))
 
-gnies_options = {'backward_phase': args.backward_phase,
-                 'centered': not args.fit_intercept,
-                 'ges_iterate': not args.ges_one_run,
-                 'ges_phases': ges_phases,
-                 'debug': args.gnies_verbose,
-                 }
-
-print("Running GnIES with settings:")
-print(" ", gnies_options)
-print("  on lambdas :", lmbdas)
+print("Running UT-IGSP with Gaussian CI/Invariance tests")
+print("  on alphas :", alphas)
+print("  on betas :", betas)
 
 
 def run_method(info, debug=False):
@@ -183,25 +170,20 @@ def run_method(info, debug=False):
     n, graph, run = info['n'], info['g'], info['r']
     data_path = args.directory + utils.test_case_filename(n, graph, run)
     data = utils.load_bin(data_path)
-    # Compute penalization parameter
-    N = sum([len(X) for X in data])
-    lmbda = info['l'] * np.log(N)
     # Run method
     start = time.time()
-    output = gnies.fit(data, ges_lambda=lmbda, **gnies_options)
+    output = ut_igsp.fit(data, alpha_ci=info['a'], alpha_inv=info['b'])
     elapsed = time.time() - start
-    print("  Ran GnIES on test case %s in %0.2f seconds." %
+    print("  Ran UT-IGSP on test case %s in %0.2f seconds." %
           (utils.serialize_dict(info), elapsed)) if debug else None
     # Store results
-    score, estimated_icpdag, estimated_I, history = output
-    result = {'estimate': estimated_icpdag,
+    estimate, estimated_I = output
+    result = {'estimate': estimate,
               'estimated_I': estimated_I,
-              'lambda': lmbda,
+              'alpha': info['a'],
+              'beta': info['b'],
               'n': n,
-              'score': score,
               'elapsed': elapsed}
-    if args.store_history:
-        result['history'] = history
     return result
 
 # ---------------
