@@ -67,7 +67,7 @@ arguments = {
     'debug': {'default': False, 'type': bool},
     'chunksize': {'type': int, 'default': 1},
     'compile_only': {'type': bool, 'default': False},
-    # GnIES parameters
+    # UT-IGSP parameters
     'alpha_lo': {'default': 0.5, 'type': float},
     'alpha_hi': {'default': 0.5, 'type': float},
     'n_alphas': {'default': 1, 'type': int},
@@ -196,12 +196,6 @@ def process_results():
     estimates = np.empty(result_matrix_shape, dtype=object)
     I_estimates = np.empty(result_matrix_shape, dtype=object)
     times = np.empty(result_matrix_shape, dtype=float)
-    # ------------------
-    # Exclusive to GnIES
-    scores = np.empty(result_matrix_shape, dtype=float)
-    if args.store_history:
-        history = np.empty(result_matrix_shape, dtype=object)
-    # ------------------
 
     # Iterate through all results, storing results in the above arrays
     count, read, failed = 0, 0, 0
@@ -228,26 +222,14 @@ def process_results():
             estimates[idx] = result['estimate']
             I_estimates[idx] = result['estimated_I']
             times[idx] = result['elapsed']
-            # ------------------
-            # Exclusive to GnIES
-            scores[idx] = result['score']
-            if args.store_history:
-                history[idx] = result['history']
-            # ------------------
             print("  done")
 
     # Store compiled results
     results = {'estimates': estimates,
                'I_estimates': I_estimates,
                'times': times}
-    # ------------------
-    # Exclusive to GnIES
-    results['scores'] = scores
-    if args.store_history:
-        results['history'] = history
-    # ------------------
     path = args.directory + utils.compiled_results_filename(METHOD_NAME)
-    utils.write_pickle(path, ((args, gnies_options, lmbdas, Ns), results))
+    utils.write_pickle(path, ((args, alphas, betas, Ns), results))
     print('\nProcessed %d/%d - read %d/%d results - %d/%d results were an exception' %
           (count, n_samples, read, count, failed, count))
     print('Wrote compiled results to "%s"' % path)
