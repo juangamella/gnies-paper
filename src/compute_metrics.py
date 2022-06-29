@@ -129,11 +129,11 @@ print("Computing metrics")
 
 for method in methods:
     # Read the method's result file
-    args, results = utils.read_pickle(
+    method_info, results = utils.read_pickle(
         args.directory + utils.compiled_results_filename(method))
     print("\n  method = %s" % method)
     print("     which was run with settings")
-    print("       ", args)
+    print("       ", method_info)
     # Load necessary estimates from the method
     estimates = results['estimates']  # I-CPDAGs
     I_estimates = results['I_estimates']  # Sets of intervention targets
