@@ -68,11 +68,11 @@ arguments = {
     'chunksize': {'type': int, 'default': 1},
     'compile_only': {'type': bool, 'default': False},
     # UT-IGSP parameters
-    'alpha_lo': {'default': 0.5, 'type': float},
-    'alpha_hi': {'default': 0.5, 'type': float},
+    'alpha_lo': {'default': 0.01, 'type': float},
+    'alpha_hi': {'default': 0.01, 'type': float},
     'n_alphas': {'default': 1, 'type': int},
-    'beta_lo': {'default': 0.5, 'type': float},
-    'beta_hi': {'default': 0.5, 'type': float},
+    'beta_lo': {'default': 0.01, 'type': float},
+    'beta_hi': {'default': 0.01, 'type': float},
     'n_betas': {'default': 1, 'type': int},
 }
 
@@ -99,7 +99,6 @@ excluded_keys = [
     'n_workers',
     'compile_only'
 ]
-excluded_keys += [] if args.ges_one_run else ['ges_one_run']
 
 # --------------------------------------------------------------------
 # Run algorithm on samples
@@ -178,6 +177,8 @@ def run_method(info, debug=False):
           (utils.serialize_dict(info), elapsed)) if debug else None
     # Store results
     estimate, estimated_I = output
+    print(estimate)
+    print(estimated_I)
     result = {'estimate': estimate,
               'estimated_I': estimated_I,
               'alpha': info['a'],
