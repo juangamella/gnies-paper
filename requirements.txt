@@ -2,3 +2,4 @@ numpy>=1.19.5
 sempler==0.2.3
 gnies==0.0.4
 pandas>=1.3.5
+causaldag==0.1a135
