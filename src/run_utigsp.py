@@ -177,8 +177,6 @@ def run_method(info, debug=False):
           (utils.serialize_dict(info), elapsed)) if debug else None
     # Store results
     estimate, estimated_I = output
-    print(estimate)
-    print(estimated_I)
     result = {'estimate': estimate,
               'estimated_I': estimated_I,
               'alpha': info['a'],
