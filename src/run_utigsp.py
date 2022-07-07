@@ -176,9 +176,11 @@ def run_method(info, debug=False):
     print("  Ran UT-IGSP on test case %s in %0.2f seconds." %
           (utils.serialize_dict(info), elapsed)) if debug else None
     # Store results
-    estimate, estimated_I = output
+    estimated_dag, estimated_I = output
+    estimate = gnies.utils.dag_to_icpdag(estimated_dag, estimated_I)
     result = {'estimate': estimate,
               'estimated_I': estimated_I,
+              'estimated_dag': estimated_dag,
               'alpha': info['a'],
               'beta': info['b'],
               'n': n,
