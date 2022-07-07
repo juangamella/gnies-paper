@@ -1,0 +1,11 @@
+# Relaunching GnIES with new ranking approach on same dataset (and different lambdas so lambda = 0.5 is included)
+
+bsub -n 50 -W 100:00 python3 -m src.run_gnies --n_workers 49 --lambda_lo 0 --lambda_hi 1 --n_lambdas 11 --directory "/cluster/scratch/gajuan/synthetic_experiments/dataset_1656422452_copy_2/"
+
+# Relaunching GnIES with new ranking approach on same dataset (and only lambda = 0.5)
+
+bsub -n 50 -W 12:00 python3 -m src.run_gnies --n_workers 49 --lambda_lo 0.5 --lambda_hi 0.5 --n_lambdas 1 --directory "/cluster/scratch/gajuan/synthetic_experiments/dataset_1656422452_copy_2/"
+
+# Relaunching UT-IGSP on same dataset but with completion
+
+bsub -n 50 -W 12:00 python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 10 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 10 --directory "/cluster/scratch/gajuan/synthetic_experiments/dataset_1656422452_copy_2/"
