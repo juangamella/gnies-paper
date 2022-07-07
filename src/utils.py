@@ -145,6 +145,14 @@ def parameter_string(args, excluded_keys):
 # Process results
 
 
+def if_none(fun, if_none=None):
+    def function(*args):
+        for arg in args:
+            if arg is None:
+                return if_none
+        return fun(*args)
+    return function
+
 def compute_metrics(estimates, ground_truth, metric_functions, trans_function):
     """Given a set of estimates, a function `trans_function` to transform
     them if necessary, compute for every metric in `metric_functions`
@@ -156,11 +164,12 @@ def compute_metrics(estimates, ground_truth, metric_functions, trans_function):
     # Iterate over each test case
     for i, case_estimates in enumerate(estimates):
         # Transform the estimates associated to this case
+        trans_function = if_none(trans_function)
         transformed_estimates = [trans_function(
             estimate) for estimate in case_estimates.flatten()]
         # Compute the requested metrics for each transformed estimate
         for metric in metric_functions:
-            case_results = [metric(estimate, ground_truth[i])
+            case_results = [if_none(metric, np.nan)(estimate, ground_truth[i])
                             for estimate in transformed_estimates]
             # Store result in the corresponding array, reshaping the
             # flattened array of transformed estimates
