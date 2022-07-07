@@ -67,6 +67,7 @@ arguments = {
     'chunksize': {'type': int, 'default': 1},
     'compile_only': {'type': bool, 'default': False},
     # GnIES parameters
+    'greedy': {'default': False, 'type': bool},
     'backward_phase': {'default': False, 'type': bool},
     'fit_intercept': {'default': False, 'type': bool},
     'ges_one_run': {'default': False, 'type': bool},
@@ -165,7 +166,14 @@ for symbol in args.ges_phases:
         raise ValueError('Invalid symbol "%s" in args.ges_phases ("%s").' %
                          (symbol, args.ges_phases))
 
-gnies_options = {'backward_phase': args.backward_phase,
+if not args.greedy:
+    approach = 'rank'
+elif args.backward_phase:
+    approach = 'greedy_w_backward'
+else:
+    approach = 'greedy'
+
+gnies_options = {'approach': approach,
                  'centered': not args.fit_intercept,
                  'ges_iterate': not args.ges_one_run,
                  'ges_phases': ges_phases,
