@@ -126,8 +126,6 @@ ground_truths = {'skeletons': ground_truth_skeletons,
                  'dags': ground_truth_dags,
                  'Is': ground_truth_Is}
 
-computed_metrics = {}
-
 print("---------------------------------------------")
 print("Computing metrics")
 
@@ -175,10 +173,8 @@ for method in methods:
     print("    computing elapsed time")
     method_metrics['times'] = results['times']
     # Store results for this method
-    computed_metrics[method] = method_metrics
+    path = args.directory + 'metrics_%s.pickle' % method
+    print("  Saved results to", path)
+    utils.write_pickle(path, (ground_truths, method_metrics))
 
 print("Done.")
-
-path = args.directory + 'metrics.pickle'  # % time.time()
-print("Saved results to", path)
-utils.write_pickle(path, (ground_truths, computed_metrics))
