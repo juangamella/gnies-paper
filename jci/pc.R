@@ -1,4 +1,4 @@
-source('pc_wrapper.R', chdir=T)
+source('jci/pc_wrapper.R', chdir=T)
 library(methods)
 library(pcalg)
 
