@@ -1,0 +1,5 @@
+# Some packages required by pcalg can only be installed through bioconductor
+install.packages("BiocManager")
+BiocManager::install(c("graph", "RBGL", "ggm"))
+
+install.packages(c("pcalg"))
