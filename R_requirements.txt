@@ -2,4 +2,12 @@
 install.packages("BiocManager")
 BiocManager::install(c("graph", "RBGL", "ggm"))
 
+# Dependencies for kpcalg
+# Must have latest version of GSL package in the OS, see https://stackoverflow.com/questions/69583193/installing-r-gsl-package-on-ubuntu
+install.packages(c("gsl", "energy"))
+
 install.packages(c("pcalg"))
+install.packages(c("kpcalg"))
+
+
+
