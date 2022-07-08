@@ -32,6 +32,7 @@ from jci.pc import PC
 
 import gnies.utils as utils
 import pandas as pd
+import numpy as np
 
 # --------------------------------------------------------------------
 
@@ -43,10 +44,10 @@ def fit(data, alpha, debug=0):
     # belongs
     regimes = []
     for i,env in enumerate(data):
-        regimes.append(np.ones(len(env)) * i)
-    regimes = pd.DataFrame(np.vstack(regimes))
+        regimes.append(np.ones(len(env), dtype=int) * (i+1))
+    regimes = pd.DataFrame(np.hstack(regimes))
     pooled = pd.DataFrame(np.vstack(data))
     # Call JCI-PC
-    instance = PC()
-    result = instance.run(data=pooled, regimes=regimes)
-    return result
+    instance = PC(verbose=True)
+    result = instance._run_pc(data=pooled, alpha=alpha, regimes=regimes)
+    return regimes,result
