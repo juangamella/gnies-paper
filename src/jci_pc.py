@@ -43,11 +43,19 @@ def fit(data, alpha, debug=0):
     # indicating to which "regime" (environment) each observation
     # belongs
     regimes = []
-    for i,env in enumerate(data):
+    for i, env in enumerate(data):
         regimes.append(np.ones(len(env), dtype=int) * (i+1))
     regimes = pd.DataFrame(np.hstack(regimes))
     pooled = pd.DataFrame(np.vstack(data))
     # Call JCI-PC
     instance = PC(verbose=True)
-    result = instance._run_pc(data=pooled, alpha=alpha, regimes=regimes)
-    return regimes,result
+    dag = instance._run_pc(data=pooled, alpha=alpha, regimes=regimes)
+    # Extract result
+    p, e = data[0].shape[1], len(data)
+    # I-CPDAG is [0,..,p] subgraph of the CPDAG of the returned graph
+    estimated_cpdag = utils.dag_to_cpdag(dag)
+    estimate = estimated_cpdag[0:p, 0:p]
+    # Targets are system variables which are children of context variables
+    context_variables = p + np.arange(e)
+    estimated_I = set.union(*[utils.ch(i, dag) for i in context_variables]) - set(context_variables)
+    return estimate, estimated_I, estimated_cpdag
