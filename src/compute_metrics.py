@@ -91,6 +91,7 @@ n_cases = info['n_cases']
 # Build ground truths
 print("---------------------------------------------")
 print("Building ground truths\n")
+ground_truth_icpdags = np.empty(n_cases, dtype=object)
 ground_truth_classes = np.empty(n_cases, dtype=object)
 ground_truth_skeletons = np.empty(n_cases, dtype=object)
 ground_truth_Is = np.empty(n_cases, dtype=object)
@@ -109,8 +110,11 @@ for i, (scm, interventions) in enumerate(info['cases']):
     # Extract true DAG
     dag = (scm.W != 0).astype(int)
     ground_truth_dags[i] = dag
+    # Compute the I-CPDAG
+    icpdag = gnies.utils.dag_to_icpdag(dag, union)
+    ground_truth_icpdags[i] = icpdag
     # Compute true equivalence class
-    true_class = gnies.utils.imec(dag, union)
+    true_class = gnies.utils.all_dags(icpdag)
     print("    %d DAGs in the true equiv. class" % len(true_class))
     ground_truth_classes[i] = true_class
     # Compute skeleton of equiv. graphs
@@ -159,6 +163,13 @@ for method in methods:
     I_metrics = utils.compute_metrics(
         I_estimates, ground_truth_Is, funs, lambda I: I)
     method_metrics.update(I_metrics)
+    # ------------------------------------
+    # Compute recovery of full I-MEC
+    print("    computing recovery of full I-MEC")
+    funs = [metrics.recovered_icpdag]
+    recovery_metric = utils.compute_metrics(
+        estimates, ground_truth_icpdags, funs, lambda x: x)
+    method_metrics.update(recovery_metric)
     # -----------------------------
     # Compute elapsed times metrics
     print("    computing elapsed time")
