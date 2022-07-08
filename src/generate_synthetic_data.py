@@ -148,7 +148,7 @@ for i in range(args.G):
     test_cases.append((scm, interventions))
 
 # Save test cases for analysis
-Ns = [int(n) for n in args.n.split(',')]
+Ns = sorted([int(n) for n in args.n.split(',')])
 to_save = {'n_cases': len(test_cases),
            'runs': args.runs,
            'Ns': Ns,
