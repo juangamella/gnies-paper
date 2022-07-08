@@ -35,7 +35,7 @@ from causaldag import unknown_target_igsp
 import gnies.utils as utils
 
 # --------------------------------------------------------------------
-
+# TODO: icpdag=True here conflicts with the call from run_ut_igsp, refactor
 
 def fit(data, alpha_ci, alpha_inv, icpdag=False, debug=0):
     observational_sample = data[0]
