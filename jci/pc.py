@@ -102,7 +102,6 @@ class PC(GraphModel):
 
             pc_results = launch_R_script("{}/pc.R".format(os.path.dirname(os.path.realpath(__file__))), self.arguments, output_function=retrieve_result, verbose=False)
             # JG: For some reason verbose works in the opposite way, i.e. FALSE yields detailed error outputs
-            print(pc_results)
 
         # Cleanup
         except Exception as e:

@@ -123,7 +123,7 @@ alphas = utils.hyperparameter_range(args.alpha_lo,
 fields = [range(n_cases), alphas, Ns, range(runs)]
 
 iterable = []
-for (graph, alpha, beta, sample_size, run) in gnies.utils.cartesian(fields, dtype=object):
+for (graph, alpha, sample_size, run) in gnies.utils.cartesian(fields, dtype=object):
     iterable.append({'a': alpha,
                      'n': sample_size,
                      'g': graph,
@@ -170,7 +170,6 @@ def run_method(info, debug=False):
               'estimated_I': estimated_I,
               'estimated_full_cpdag': estimated_full_cpdag,
               'alpha': info['a'],
-              'beta': info['b'],
               'n': n,
               'elapsed': elapsed}
     return result
@@ -218,7 +217,7 @@ def process_results():
                'I_estimates': I_estimates,
                'times': times}
     path = args.directory + utils.compiled_results_filename(METHOD_NAME)
-    utils.write_pickle(path, ((args, alphas, betas, Ns), results))
+    utils.write_pickle(path, ((args, alphas, Ns), results))
     print('\nProcessed %d/%d - read %d/%d results - %d/%d results were an exception' %
           (count, n_samples, read, count, failed, count))
     print('Wrote compiled results to "%s"' % path)
