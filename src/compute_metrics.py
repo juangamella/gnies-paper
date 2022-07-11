@@ -46,12 +46,42 @@ def all_dags(PDAG):
     large MECs"""
     try:
         return gnies.utils.all_dags(PDAG, max_combinations=int(1e4))
-    except MemoryError:
+    except MemoryError as e:
+        print(' '*8, e)
         return None
     except ValueError as e:
-        # print(' '*8, e)
+        print(' '*8, e)
         return None
 
+def compute_metrics(estimates, ground_truth, metric_functions, trans_function, debug=False):
+    """Given a set of estimates, a function `trans_function` to transform
+    them if necessary, compute for every metric in `metric_functions`
+    their score when compared to the ground truth"""
+    assert len(ground_truth) == len(estimates)
+    # Initialize the dictionary of arrays where results will be stored
+    computed_metrics = dict((metric, np.empty_like(
+        estimates, dtype=float)) for metric in metric_functions)
+    # Iterate over each test case
+    for i, case_estimates in enumerate(estimates):
+        if debug:
+            print(' '*5, "computing for case %d/%d" % (i, len(estimates)), end='\r')
+        # Transform the estimates associated to this case
+        trans_function = utils.if_none(trans_function)
+        transformed_estimates = [trans_function(
+            estimate) for estimate in case_estimates.flatten()]
+        # Compute the requested metrics for each transformed estimate
+        for metric in metric_functions:
+            case_results = [utils.if_none(metric, np.nan)(estimate, ground_truth[i])
+                            for estimate in transformed_estimates]
+            # Store result in the corresponding array, reshaping the
+            # flattened array of transformed estimates
+            computed_metrics[metric][i] = np.reshape(
+                case_results, computed_metrics[metric][i].shape)
+    # Return
+    print() if debug else None
+    return computed_metrics
+
+    
 # --------------------------------------------------------------------
 # Parse input parameters
 
@@ -173,6 +203,13 @@ for method in methods:
     recovery_metric = utils.compute_metrics(
         estimates, ground_truth_icpdags, funs, lambda x: x)
     method_metrics.update(recovery_metric)
+    # -----------------------------
+    # Compute proportion of times that method produced an estimate
+    print("    computing method success")
+    funs = [metrics.success_metric]
+    success_metric = utils.compute_metrics(
+        estimates, ground_truth_icpdags, funs, lambda x: x)
+    method_metrics.update(success_metric)
     # -----------------------------
     # Compute elapsed times metrics
     print("    computing elapsed time")

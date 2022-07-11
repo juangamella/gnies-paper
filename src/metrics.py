@@ -42,6 +42,10 @@ def recovered_icpdag(estimate, truth):
     return ((estimate == truth).all()).astype(int)
 
 
+def success_metric(estimate, truth):
+    return int(estimate is not None)
+
+
 def type_1_struct(estimate, truth):
     true_imec = _imec(truth)
     print("Enumerated true imec: %d graphs" % len(true_imec))
