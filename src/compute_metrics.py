@@ -32,20 +32,25 @@
 """
 
 import argparse
-import sempler
-import sempler.generators as gen
 import numpy as np
 import src.utils as utils
 import gnies.utils
-import gc  # Garbage collector
-import time
-import os
-import pickle
 import src.metrics as metrics
 
 # --------------------------------------------------------------------
 # Auxiliary functions
 
+
+def all_dags(PDAG):
+    """A wrapper for gnies.utils.all_dags but with protection against too
+    large MECs"""
+    try:
+        return gnies.utils.all_dags(PDAG, max_combinations=int(1e4))
+    except MemoryError:
+        return None
+    except ValueError as e:
+        # print(' '*8, e)
+        return None
 
 # --------------------------------------------------------------------
 # Parse input parameters
@@ -145,7 +150,7 @@ for method in methods:
     print("    computing class metrics")
     funs = [metrics.type_1_structc, metrics.type_2_structc]
     class_metrics = utils.compute_metrics(
-        estimates, ground_truth_classes, funs, gnies.utils.all_dags)
+        estimates, ground_truth_classes, funs, all_dags, debug=True)
     method_metrics.update(class_metrics)
     # -------------------------
     # Compute skeleton recovery

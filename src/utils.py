@@ -153,7 +153,8 @@ def if_none(fun, if_none=None):
         return fun(*args)
     return function
 
-def compute_metrics(estimates, ground_truth, metric_functions, trans_function):
+
+def compute_metrics(estimates, ground_truth, metric_functions, trans_function, debug=False):
     """Given a set of estimates, a function `trans_function` to transform
     them if necessary, compute for every metric in `metric_functions`
     their score when compared to the ground truth"""
@@ -163,6 +164,8 @@ def compute_metrics(estimates, ground_truth, metric_functions, trans_function):
         estimates, dtype=float)) for metric in metric_functions)
     # Iterate over each test case
     for i, case_estimates in enumerate(estimates):
+        if debug:
+            print(' '*5, "computing for case %d/%d" % (i, len(estimates)), end='\r')
         # Transform the estimates associated to this case
         trans_function = if_none(trans_function)
         transformed_estimates = [trans_function(
