@@ -32,21 +32,57 @@
 """
 
 import argparse
-import sempler
-import sempler.generators as gen
 import numpy as np
 import src.utils as utils
 import gnies.utils
-import gc  # Garbage collector
-import time
-import os
-import pickle
 import src.metrics as metrics
 
 # --------------------------------------------------------------------
 # Auxiliary functions
 
 
+def all_dags(PDAG):
+    """A wrapper for gnies.utils.all_dags but with protection against too
+    large MECs"""
+    try:
+        return gnies.utils.all_dags(PDAG, max_combinations=int(1e4))
+    except MemoryError as e:
+        print(' '*8, e)
+        return None
+    except ValueError as e:
+        print(' '*8, e)
+        return None
+
+def compute_metrics(estimates, ground_truth, metric_functions, trans_function, noneify=True, debug=False):
+    """Given a set of estimates, a function `trans_function` to transform
+    them if necessary, compute for every metric in `metric_functions`
+    their score when compared to the ground truth"""
+    assert len(ground_truth) == len(estimates)
+    # Initialize the dictionary of arrays where results will be stored
+    computed_metrics = dict((metric, np.empty_like(
+        estimates, dtype=float)) for metric in metric_functions)
+    # Iterate over each test case
+    for i, case_estimates in enumerate(estimates):
+        if debug:
+            print(' '*5, "computing for case %d/%d" % (i, len(estimates)), end='\r')
+        # Transform the estimates associated to this case
+        trans_function = utils.if_none(trans_function) if noneify else trans_function
+        transformed_estimates = [trans_function(
+            estimate) for estimate in case_estimates.flatten()]
+        # Compute the requested metrics for each transformed estimate
+        for metric in metric_functions:
+            metric_function = utils.if_none(metric, np.nan) if noneify else metric
+            case_results = [metric_function(estimate, ground_truth[i])
+                            for estimate in transformed_estimates]
+            # Store result in the corresponding array, reshaping the
+            # flattened array of transformed estimates
+            computed_metrics[metric][i] = np.reshape(
+                case_results, computed_metrics[metric][i].shape)
+    # Return
+    print() if debug else None
+    return computed_metrics
+
+    
 # --------------------------------------------------------------------
 # Parse input parameters
 
@@ -126,8 +162,6 @@ ground_truths = {'skeletons': ground_truth_skeletons,
                  'dags': ground_truth_dags,
                  'Is': ground_truth_Is}
 
-computed_metrics = {}
-
 print("---------------------------------------------")
 print("Computing metrics")
 
@@ -146,39 +180,44 @@ for method in methods:
     # Compute t1/t2 class metrics
     print("    computing class metrics")
     funs = [metrics.type_1_structc, metrics.type_2_structc]
-    class_metrics = utils.compute_metrics(
-        estimates, ground_truth_classes, funs, gnies.utils.all_dags)
+    class_metrics = compute_metrics(
+        estimates, ground_truth_classes, funs, all_dags, debug=True)
     method_metrics.update(class_metrics)
     # -------------------------
     # Compute skeleton recovery
     print("    computing skeleton metrics")
     funs = [metrics.type_1_skeleton, metrics.type_2_skeleton]
-    skeleton_metrics = utils.compute_metrics(
+    skeleton_metrics = compute_metrics(
         estimates, ground_truth_skeletons, funs, gnies.utils.skeleton)
     method_metrics.update(skeleton_metrics)
     # ------------------------------------
     # Compute intervention target recovery
     print("    computing intervention target metrics")
     funs = [metrics.type_1_I, metrics.type_2_I]
-    I_metrics = utils.compute_metrics(
+    I_metrics = compute_metrics(
         I_estimates, ground_truth_Is, funs, lambda I: I)
     method_metrics.update(I_metrics)
     # ------------------------------------
     # Compute recovery of full I-MEC
     print("    computing recovery of full I-MEC")
     funs = [metrics.recovered_icpdag]
-    recovery_metric = utils.compute_metrics(
+    recovery_metric = compute_metrics(
         estimates, ground_truth_icpdags, funs, lambda x: x)
     method_metrics.update(recovery_metric)
+    # -----------------------------
+    # Compute proportion of times that method produced an estimate
+    print("    computing method success")
+    funs = [metrics.success_metric]
+    success_metric = compute_metrics(
+        estimates, ground_truth_icpdags, funs, lambda x: x, noneify=False)
+    method_metrics.update(success_metric)
     # -----------------------------
     # Compute elapsed times metrics
     print("    computing elapsed time")
     method_metrics['times'] = results['times']
     # Store results for this method
-    computed_metrics[method] = method_metrics
+    path = args.directory + 'metrics_%s.pickle' % method
+    print("  Saved results to", path)
+    utils.write_pickle(path, (ground_truths, method_metrics))
 
 print("Done.")
-
-path = args.directory + 'metrics.pickle'  # % time.time()
-print("Saved results to", path)
-utils.write_pickle(path, (ground_truths, computed_metrics))

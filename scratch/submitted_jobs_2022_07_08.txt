@@ -1,0 +1,10 @@
+# Launching JCI-PC
+
+bsub -n 50 -W 12:00 python3 -m src.run_jci_pc --n_workers 49 --alpha_lo 0 --alpha_hi 1 --n_alphas 11 --directory "/cluster/scratch/gajuan/synthetic_experiments/dataset_1656422452_runs:10_seed:42_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:noise_i_size:1_i_v_min:5_i_v_max:10_n:10,100,1000/"
+
+# Launching GES baseline
+
+bsub -n 50 -W 1:00 python3 -m src.run_ges --n_workers 49 --lambda_lo 0 --lambda_hi 1 --n_lambdas 11 --directory "/cluster/scratch/gajuan/synthetic_experiments/dataset_1656422452_runs:10_seed:42_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:noise_i_size:1_i_v_min:5_i_v_max:10_n:10,100,1000/"
+
+
+

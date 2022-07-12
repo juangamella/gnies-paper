@@ -45,6 +45,7 @@ import traceback
 import src.ut_igsp as ut_igsp
 
 METHOD_NAME = 'ut_igsp'
+METHOD_NAME_PLUS = 'ut_igsp_plus'
 
 # --------------------------------------------------------------------
 # Auxiliary functions
@@ -176,9 +177,8 @@ def run_method(info, debug=False):
     print("  Ran UT-IGSP on test case %s in %0.2f seconds." %
           (utils.serialize_dict(info), elapsed)) if debug else None
     # Store results
-    estimated_dag, estimated_I = output
-    estimate = gnies.utils.dag_to_icpdag(estimated_dag, estimated_I)
-    result = {'estimate': estimate,
+    estimated_icpdag, estimated_I, estimated_dag = output
+    result = {'estimate': estimated_icpdag,
               'estimated_I': estimated_I,
               'estimated_dag': estimated_dag,
               'alpha': info['a'],
@@ -196,6 +196,7 @@ def process_results():
     # Common to all methods
     estimates = np.empty(result_matrix_shape, dtype=object)
     I_estimates = np.empty(result_matrix_shape, dtype=object)
+    dag_estimates = np.empty(result_matrix_shape, dtype=object)
     times = np.empty(result_matrix_shape, dtype=float)
 
     # Iterate through all results, storing results in the above arrays
@@ -223,16 +224,27 @@ def process_results():
             estimates[idx] = result['estimate']
             I_estimates[idx] = result['estimated_I']
             times[idx] = result['elapsed']
+            dag_estimates[idx] = result['estimated_dag']
             print("  done")
 
+    print('\nProcessed %d/%d - read %d/%d results - %d/%d results were an exception' %
+          (count, n_samples, read, count, failed, count))
     # Store compiled results
+
+    # For UT-IGSP+
     results = {'estimates': estimates,
+               'I_estimates': I_estimates,
+               'times': times}
+    path = args.directory + utils.compiled_results_filename(METHOD_NAME_PLUS)
+    utils.write_pickle(path, ((args, alphas, betas, Ns), results))
+
+    # For UT-IGSP (estimated I-CPDAGs are the returned DAGs)
+    results = {'estimates': dag_estimates,
                'I_estimates': I_estimates,
                'times': times}
     path = args.directory + utils.compiled_results_filename(METHOD_NAME)
     utils.write_pickle(path, ((args, alphas, betas, Ns), results))
-    print('\nProcessed %d/%d - read %d/%d results - %d/%d results were an exception' %
-          (count, n_samples, read, count, failed, count))
+
     print('Wrote compiled results to "%s"' % path)
 
 

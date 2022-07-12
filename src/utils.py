@@ -153,31 +153,6 @@ def if_none(fun, if_none=None):
         return fun(*args)
     return function
 
-def compute_metrics(estimates, ground_truth, metric_functions, trans_function):
-    """Given a set of estimates, a function `trans_function` to transform
-    them if necessary, compute for every metric in `metric_functions`
-    their score when compared to the ground truth"""
-    assert len(ground_truth) == len(estimates)
-    # Initialize the dictionary of arrays where results will be stored
-    computed_metrics = dict((metric, np.empty_like(
-        estimates, dtype=float)) for metric in metric_functions)
-    # Iterate over each test case
-    for i, case_estimates in enumerate(estimates):
-        # Transform the estimates associated to this case
-        trans_function = if_none(trans_function)
-        transformed_estimates = [trans_function(
-            estimate) for estimate in case_estimates.flatten()]
-        # Compute the requested metrics for each transformed estimate
-        for metric in metric_functions:
-            case_results = [if_none(metric, np.nan)(estimate, ground_truth[i])
-                            for estimate in transformed_estimates]
-            # Store result in the corresponding array, reshaping the
-            # flattened array of transformed estimates
-            computed_metrics[metric][i] = np.reshape(
-                case_results, computed_metrics[metric][i].shape)
-    # Return
-    return computed_metrics
-
 
 def compile_results(directory, clean=False):
     print('Compiling test cases in "%s"' % directory)

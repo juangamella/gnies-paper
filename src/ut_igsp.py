@@ -37,7 +37,7 @@ import gnies.utils as utils
 # --------------------------------------------------------------------
 # TODO: icpdag=True here conflicts with the call from run_ut_igsp, refactor
 
-def fit(data, alpha_ci, alpha_inv, icpdag=False, debug=0):
+def fit(data, alpha_ci, alpha_inv, debug=0):
     observational_sample = data[0]
     interventional_samples = data[1:]
     p = observational_sample.shape[1]
@@ -60,8 +60,5 @@ def fit(data, alpha_ci, alpha_inv, icpdag=False, debug=0):
     # Process estimates
     estimated_dag = estimated_dag.to_amat()[0]
     estimated_I = set.union(*est_targets_list)
-    if icpdag:
-        estimate = utils.dag_to_imec(estimated_dag, estimated_I)
-    else:
-        estimate = estimated_dag
-    return (estimate, estimated_I)
+    estimated_icpdag = utils.dag_to_icpdag(estimated_dag, estimated_I)
+    return (estimated_icpdag, estimated_I, estimated_dag)

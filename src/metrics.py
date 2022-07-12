@@ -42,6 +42,10 @@ def recovered_icpdag(estimate, truth):
     return ((estimate == truth).all()).astype(int)
 
 
+def success_metric(estimate, truth):
+    return int(estimate is not None)
+
+
 def type_1_struct(estimate, truth):
     true_imec = _imec(truth)
     print("Enumerated true imec: %d graphs" % len(true_imec))
@@ -116,7 +120,7 @@ def _maxmin_metric(maxclass, minclass, dist_fun):
     """
     Given two sets of objects class_1 and class_2 and a function dist_fun, compute the metric
 
-       max (A2 in maxclass) min (A1 in minclass) dist_fun(A1, A2).
+       max (A2 in maxclass) min (A1 in minclass) dist_fun(A2, A1).
 
     """
     maxmin = -np.Inf
