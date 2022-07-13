@@ -133,9 +133,15 @@ print("Dataset contains a total of %d samples from %d cases at sample sizes %s f
 # ---------------------------------------------------------------------
 # Build iterable, result_matrix_shape, iterable entry to index function
 
-lmbdas = utils.hyperparameter_range(args.lambda_lo,
-                                    args.lambda_hi,
-                                    args.n_lambdas)
+lmbdas = list(utils.hyperparameter_range(args.lambda_lo,
+                                         args.lambda_hi,
+                                         args.n_lambdas))
+
+# Make sure 0.5, i.e. the BIC score, is always included, and is always
+# in first position
+lmbdas.remove(0.5) if 0.5 in lmbdas else None
+lmbdas = [0.5] + lmbdas
+
 fields = [range(n_cases), lmbdas, Ns, range(runs)]
 
 iterable = []
