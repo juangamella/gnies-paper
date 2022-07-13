@@ -36,6 +36,7 @@ import numpy as np
 import src.utils as utils
 import gnies.utils
 import src.metrics as metrics
+import gies.utils
 
 # --------------------------------------------------------------------
 # Auxiliary functions
@@ -96,6 +97,7 @@ arguments = {
     'chunksize': {'type': int, 'default': 1},
     # Other flags parameters
     'methods': {'type': str},
+    'do': {'default': False, 'type': bool}
 }
 
 # Parse settings from input
@@ -137,17 +139,23 @@ for i, (scm, interventions) in enumerate(info['cases']):
     print("    interventions :", interventions)
     # Extract union of intervention targets
     union = set()
+    target_family = []
     # Note: interventions are [{intervention_type: {target: (mean, variance)}*}]
     for intervention in interventions:
         parameters = list(intervention.values())[0]
-        union |= set(list(parameters.keys()))
+        targets = list(parameters.keys())
+        target_family.append(targets)
+        union |= set(targets)
     print("    union of targets :", union)
     ground_truth_Is[i] = union
     # Extract true DAG
     dag = (scm.W != 0).astype(int)
     ground_truth_dags[i] = dag
     # Compute the I-CPDAG
-    icpdag = gnies.utils.dag_to_icpdag(dag, union)
+    if args.do:
+        icpdag = gies.utils.replace_unprotected(dag, target_family)
+    else:
+        icpdag = gnies.utils.dag_to_icpdag(dag, union)
     ground_truth_icpdags[i] = icpdag
     # Compute true equivalence class
     true_class = gnies.utils.all_dags(icpdag)
@@ -192,11 +200,12 @@ for method in methods:
     method_metrics.update(skeleton_metrics)
     # ------------------------------------
     # Compute intervention target recovery
-    print("    computing intervention target metrics")
-    funs = [metrics.type_1_I, metrics.type_2_I]
-    I_metrics = compute_metrics(
-        I_estimates, ground_truth_Is, funs, lambda I: I)
-    method_metrics.update(I_metrics)
+    if not args.do:
+        print("    computing intervention target metrics")
+        funs = [metrics.type_1_I, metrics.type_2_I]
+        I_metrics = compute_metrics(
+            I_estimates, ground_truth_Is, funs, lambda I: I)
+        method_metrics.update(I_metrics)
     # ------------------------------------
     # Compute recovery of full I-MEC
     print("    computing recovery of full I-MEC")
