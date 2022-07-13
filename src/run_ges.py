@@ -74,6 +74,7 @@ arguments = {
     'lambda_lo': {'default': 0.5, 'type': float},
     'lambda_hi': {'default': 0.5, 'type': float},
     'n_lambdas': {'default': 1, 'type': int},
+    'lambdas': {'type': str},
     'ges_verbose': {'default': False, 'type': bool},
 }
 
@@ -103,6 +104,10 @@ excluded_keys = [
     'compile_only'
 ]
 excluded_keys += [] if args.one_run else ['one_run']
+if args.lambdas is None:
+    excluded_keys += ['lambdas']
+else:
+    excluded_keys += ['lambda_lo', 'lambda_hi', 'n_lambdas']
 
 # --------------------------------------------------------------------
 # Run algorithm on samples
@@ -122,14 +127,12 @@ print("Dataset contains a total of %d samples from %d cases at sample sizes %s f
 # ---------------------------------------------------------------------
 # Build iterable, result_matrix_shape, iterable entry to index function
 
-lmbdas = list(utils.hyperparameter_range(args.lambda_lo,
-                                         args.lambda_hi,
-                                         args.n_lambdas))
-
-# Make sure 0.5, i.e. the BIC score, is always included, and is always
-# in first position
-lmbdas.remove(0.5) if 0.5 in lmbdas else None
-lmbdas = [0.5] + lmbdas
+if args.lambdas is not None:
+    lmbdas = sorted([float(n) for n in args.lambdas.split(',')])
+else:
+    lmbdas = utils.hyperparameter_range(args.lambda_lo,
+                                        args.lambda_hi,
+                                        args.n_lambdas)
     
 fields = [range(n_cases), lmbdas, Ns, range(runs)]
 
