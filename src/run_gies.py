@@ -124,10 +124,8 @@ n_cases, runs, Ns, p = info['n_cases'], info['runs'], info['Ns'], info['args'].p
 all_targets = []
 # Note: interventions are [{intervention_type: {target: (mean, variance)}*}]ñ
 for (_, interventions) in info['cases']:
-    print(interventions)
     case_targets = [list(list(i.values())[0].keys()) for i in interventions]
     all_targets.append(case_targets)
-    print(case_targets)
 
 n_samples = n_cases * runs * len(Ns)
 print("Dataset contains a total of %d samples from %d cases at sample sizes %s for %d runs" %
