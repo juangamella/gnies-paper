@@ -1,0 +1,11 @@
+# Generate synthetic data with do interventions
+python3 -m src.generate_synthetic_data --cluster --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type do
+
+# Run GnIES
+bsub -n 50 -W 100:00 python3 -m src.run_gnies --n_workers 49 --greedy --directory "/cluster/scratch/gajuan/synthetic_experiments/dataset_1657710723_runs:10_seed:42_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:do_i_size:1_i_v_min:5_i_v_max:10_n:10,100,1000/" --lambdas 0.01,0.25,0.5,0.75,1
+
+# Run UT-IGSP
+bsub -n 50 -W 12:00 python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory "/cluster/scratch/gajuan/synthetic_experiments/dataset_1657710723_runs:10_seed:42_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:do_i_size:1_i_v_min:5_i_v_max:10_n:10,100,1000/"
+
+# Run GIES as baseline
+bsub -n 50 -W 12:00 python3 -m src.run_gies --n_workers 49 --directory "/cluster/scratch/gajuan/synthetic_experiments/dataset_1657710723_runs:10_seed:42_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:do_i_size:1_i_v_min:5_i_v_max:10_n:10,100,1000/" --lambdas 0.01,0.25,0.5,0.75,1
