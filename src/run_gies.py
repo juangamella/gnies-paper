@@ -42,7 +42,7 @@ import argparse
 import os
 import multiprocessing
 import gnies.utils
-import ges
+import gies
 import src.utils as utils
 import traceback
 
@@ -197,13 +197,13 @@ def run_method(info, debug=False):
     targets = all_targets[graph]
     # Run method
     start = time.time()
-    score_class = gies.scores.GaussObsL0Pen(data, targets, lmbda=lmbda)
+    score_class = gies.scores.GaussIntL0Pen(data, targets, lmbda=lmbda)
     output = gies.fit(score_class, **gies_options)
     elapsed = time.time() - start
     print("  Ran GIES on test case %s in %0.2f seconds." %
           (utils.serialize_dict(info), elapsed)) if debug else None
     # Store results
-    estimated_icpdag, score = output
+    estimated_icpdag, _ = output
     result = {'estimate': estimated_icpdag,
               'estimated_I': [set(t) for t in targets],
               'lambda': lmbda,
