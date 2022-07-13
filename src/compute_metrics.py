@@ -46,7 +46,7 @@ def all_dags(PDAG):
     """A wrapper for gnies.utils.all_dags but with protection against too
     large MECs"""
     try:
-        return gnies.utils.all_dags(PDAG, max_combinations=int(1e4))
+        return gnies.utils.all_dags(PDAG, max_combinations=None)
     except MemoryError as e:
         print(' '*8, e)
         return None
