@@ -125,7 +125,13 @@ n_cases, runs, Ns, p = info['n_cases'], info['runs'], info['Ns'], info['args'].p
 all_targets = []
 # Note: interventions are [{intervention_type: {target: (mean, variance)}*}]ñ
 for (_, interventions) in info['cases']:
-    case_targets = [list(list(i.values())[0].keys()) for i in interventions]
+    case_targets = []
+    for intervention in interventions:
+        parameters = list(intervention.values())[0]
+        if parameters is None:
+            case_targets.append([])
+        else:
+            case_targets.append(list(parameters.keys()))
     all_targets.append(case_targets)
 
 n_samples = n_cases * runs * len(Ns)
