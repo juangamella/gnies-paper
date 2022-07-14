@@ -127,6 +127,7 @@ print(args)  # For debugging
 methods = args.methods.split(',')
 
 # Extract dataset information
+args.directory += '' if args.directory[-1] == '/' else '/'
 info = utils.read_pickle(args.directory + utils.INFO_FILENAME)
 n_cases = info['n_cases']
 
