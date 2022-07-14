@@ -119,6 +119,7 @@ print("Visible workers: %d vs. args.n_workers %d" %
       (os.cpu_count(), args.n_workers))
 
 # Extract dataset information
+args.directory += '' if args.directory[-1] == '/' else '/'
 info = utils.read_pickle(args.directory + utils.INFO_FILENAME)
 n_cases, runs, Ns, p = info['n_cases'], info['runs'], info['Ns'], info['args'].p
 n_samples = n_cases * runs * len(Ns)
