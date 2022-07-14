@@ -33,11 +33,13 @@ from causaldag.utils.invariance_tests import gauss_invariance_suffstat, gauss_in
 from causaldag import unknown_target_igsp
 
 import gnies.utils as utils
+import gies.utils
 
 # --------------------------------------------------------------------
 # TODO: icpdag=True here conflicts with the call from run_ut_igsp, refactor
 
-def fit(data, alpha_ci, alpha_inv, debug=0):
+
+def fit(data, alpha_ci, alpha_inv, debug=0, completion='gnies'):
     observational_sample = data[0]
     interventional_samples = data[1:]
     p = observational_sample.shape[1]
@@ -60,5 +62,14 @@ def fit(data, alpha_ci, alpha_inv, debug=0):
     # Process estimates
     estimated_dag = estimated_dag.to_amat()[0]
     estimated_I = set.union(*est_targets_list)
-    estimated_icpdag = utils.dag_to_icpdag(estimated_dag, estimated_I)
+    if completion == 'gnies':
+        # Compute equivalence class using nI-equivalence (Gamella et. al 2022)
+        estimated_icpdag = utils.dag_to_icpdag(estimated_dag, estimated_I)
+    elif completion == 'gies':
+        # Compute equivalence class using the I-equivalence from Hauser & Bühlmann 2012
+        targets = [list(t) for t in est_targets_list]
+        estimated_icpdag = gies.utils.replace_unprotected(
+            estimated_dag, targets)
+    else:
+        raise ValueError('Invalid value="%s" for field completion.')
     return (estimated_icpdag, estimated_I, estimated_dag)

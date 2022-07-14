@@ -75,6 +75,7 @@ arguments = {
     'beta_lo': {'default': 0.01, 'type': float},
     'beta_hi': {'default': 0.01, 'type': float},
     'n_betas': {'default': 1, 'type': int},
+    'do': {'default': False, 'type': bool}
 }
 
 # Parse settings from input
@@ -173,7 +174,8 @@ def run_method(info, debug=False):
     data = utils.load_bin(data_path)
     # Run method
     start = time.time()
-    output = ut_igsp.fit(data, alpha_ci=info['a'], alpha_inv=info['b'])
+    output = ut_igsp.fit(
+        data, alpha_ci=info['a'], alpha_inv=info['b'], completion='gies' if args.do else 'gnies')
     elapsed = time.time() - start
     print("  Ran UT-IGSP on test case %s in %0.2f seconds." %
           (utils.serialize_dict(info), elapsed)) if debug else None
