@@ -1,0 +1,8 @@
+
+# Euler test run
+python3 -m src.generate_synthetic_data --cluster --G 10 --runs 1 --n 10,100,1000 --i_size 1 --e 4 --p 10
+bsub -n 50 -W 3:00 python3 -m src.run_gnies --n_workers 49 --lambda_lo 0.01 --lambda_hi 1 --n_lambdas 10 --directory "/cluster/scratch/gajuan/synthetic_experiments/dataset_1656417508_runs:1_seed:42_G:10_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:noise_i_size:1_i_v_min:5_i_v_max:10_n:10,100,1000/"
+
+# Full GnIES run attempt
+python3 -m src.generate_synthetic_data --cluster --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10
+bsub -n 50 -W 3:00 python3 -m src.run_gnies --n_workers 49 --lambda_lo 0.01 --lambda_hi 1 --n_lambdas 10 --directory 
