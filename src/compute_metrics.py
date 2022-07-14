@@ -46,13 +46,14 @@ def all_dags(PDAG):
     """A wrapper for gnies.utils.all_dags but with protection against too
     large MECs"""
     try:
-        return gnies.utils.all_dags(PDAG, max_combinations=None)
+        return gnies.utils.all_dags(PDAG)
     except MemoryError as e:
         print(' '*8, e)
         return None
     except ValueError as e:
         print(' '*8, e)
         return None
+
 
 def compute_metrics(estimates, ground_truth, metric_functions, trans_function, noneify=True, debug=False):
     """Given a set of estimates, a function `trans_function` to transform
@@ -65,14 +66,17 @@ def compute_metrics(estimates, ground_truth, metric_functions, trans_function, n
     # Iterate over each test case
     for i, case_estimates in enumerate(estimates):
         if debug:
-            print(' '*5, "computing for case %d/%d" % (i, len(estimates)), end='\r')
+            print(' '*5, "computing for case %d/%d" %
+                  (i, len(estimates)), end='\r')
         # Transform the estimates associated to this case
-        trans_function = utils.if_none(trans_function) if noneify else trans_function
+        trans_function = utils.if_none(
+            trans_function) if noneify else trans_function
         transformed_estimates = [trans_function(
             estimate) for estimate in case_estimates.flatten()]
         # Compute the requested metrics for each transformed estimate
         for metric in metric_functions:
-            metric_function = utils.if_none(metric, np.nan) if noneify else metric
+            metric_function = utils.if_none(
+                metric, np.nan) if noneify else metric
             case_results = [metric_function(estimate, ground_truth[i])
                             for estimate in transformed_estimates]
             # Store result in the corresponding array, reshaping the
@@ -83,7 +87,7 @@ def compute_metrics(estimates, ground_truth, metric_functions, trans_function, n
     print() if debug else None
     return computed_metrics
 
-    
+
 # --------------------------------------------------------------------
 # Parse input parameters
 
