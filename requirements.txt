@@ -15,3 +15,5 @@ cdt==0.5.23
 
 # For DRF
 rpy2==3.5.2
+# --extra-index-url https://test.pypi.org/simple/
+# drf==0.1
