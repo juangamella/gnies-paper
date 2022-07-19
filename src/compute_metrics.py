@@ -48,10 +48,10 @@ def all_dags(PDAG):
     try:
         return gnies.utils.all_dags(PDAG)
     except MemoryError as e:
-        print(' '*8, e)
+        print(" " * 8, e)
         return None
     except ValueError as e:
-        print(' '*8, e)
+        print(" " * 8, e)
         return None
 
 
@@ -61,28 +61,21 @@ def compute_metrics(estimates, ground_truth, metric_functions, trans_function, n
     their score when compared to the ground truth"""
     assert len(ground_truth) == len(estimates)
     # Initialize the dictionary of arrays where results will be stored
-    computed_metrics = dict((metric, np.empty_like(
-        estimates, dtype=float)) for metric in metric_functions)
+    computed_metrics = dict((metric, np.empty_like(estimates, dtype=float)) for metric in metric_functions)
     # Iterate over each test case
     for i, case_estimates in enumerate(estimates):
         if debug:
-            print(' '*5, "computing for case %d/%d" %
-                  (i, len(estimates)), end='\r')
+            print(" " * 5, "computing for case %d/%d" % (i, len(estimates)), end="\r")
         # Transform the estimates associated to this case
-        trans_function = utils.if_none(
-            trans_function) if noneify else trans_function
-        transformed_estimates = [trans_function(
-            estimate) for estimate in case_estimates.flatten()]
+        trans_function = utils.if_none(trans_function) if noneify else trans_function
+        transformed_estimates = [trans_function(estimate) for estimate in case_estimates.flatten()]
         # Compute the requested metrics for each transformed estimate
         for metric in metric_functions:
-            metric_function = utils.if_none(
-                metric, np.nan) if noneify else metric
-            case_results = [metric_function(estimate, ground_truth[i])
-                            for estimate in transformed_estimates]
+            metric_function = utils.if_none(metric, np.nan) if noneify else metric
+            case_results = [metric_function(estimate, ground_truth[i]) for estimate in transformed_estimates]
             # Store result in the corresponding array, reshaping the
             # flattened array of transformed estimates
-            computed_metrics[metric][i] = np.reshape(
-                case_results, computed_metrics[metric][i].shape)
+            computed_metrics[metric][i] = np.reshape(case_results, computed_metrics[metric][i].shape)
     # Return
     print() if debug else None
     return computed_metrics
@@ -95,28 +88,25 @@ def compute_metrics(estimates, ground_truth, metric_functions, trans_function, n
 # Definitions and default settings
 arguments = {
     # Execution parameters
-    'directory': {'type': str},
-    'n_workers': {'default': 1, 'type': int},
-    'debug': {'default': False, 'type': bool},
-    'chunksize': {'type': int, 'default': 1},
+    "directory": {"type": str},
+    "n_workers": {"default": 1, "type": int},
+    "debug": {"default": False, "type": bool},
+    "chunksize": {"type": int, "default": 1},
     # Other flags parameters
-    'methods': {'type': str},
-    'do': {'default': False, 'type': bool}
+    "methods": {"type": str},
+    "do": {"default": False, "type": bool},
 }
 
 # Parse settings from input
-parser = argparse.ArgumentParser(description='Run experiments')
+parser = argparse.ArgumentParser(description="Run experiments")
 for name, params in arguments.items():
-    if params['type'] == bool:
-        options = {'action': 'store_true'}
+    if params["type"] == bool:
+        options = {"action": "store_true"}
     else:
-        options = {'action': 'store', 'type': params['type']}
-    if 'default' in params:
-        options['default'] = params['default']
-    parser.add_argument("--" + name,
-                        dest=name,
-                        required=False,
-                        **options)
+        options = {"action": "store", "type": params["type"]}
+    if "default" in params:
+        options["default"] = params["default"]
+    parser.add_argument("--" + name, dest=name, required=False, **options)
 
 args = parser.parse_args()
 print(args)  # For debugging
@@ -124,12 +114,12 @@ print(args)  # For debugging
 
 # --------------------------------------------------------------------
 # Compute metrics
-methods = args.methods.split(',')
+methods = args.methods.split(",")
 
 # Extract dataset information
-args.directory += '' if args.directory[-1] == '/' else '/'
+args.directory += "" if args.directory[-1] == "/" else "/"
 info = utils.read_pickle(args.directory + utils.INFO_FILENAME)
-n_cases = info['n_cases']
+n_cases = info["n_cases"]
 
 # Build ground truths
 print("---------------------------------------------")
@@ -139,7 +129,7 @@ ground_truth_classes = np.empty(n_cases, dtype=object)
 ground_truth_skeletons = np.empty(n_cases, dtype=object)
 ground_truth_Is = np.empty(n_cases, dtype=object)
 ground_truth_dags = np.empty(n_cases, dtype=object)
-for i, (scm, interventions) in enumerate(info['cases']):
+for i, (scm, interventions) in enumerate(info["cases"]):
     print("  case %d" % i)
     print("    interventions :", interventions)
     # Extract union of intervention targets
@@ -148,6 +138,8 @@ for i, (scm, interventions) in enumerate(info['cases']):
     # Note: interventions are [{intervention_type: {target: (mean, variance)}*}]
     for intervention in interventions:
         parameters = list(intervention.values())[0]
+        if parameters is None:
+            continue
         targets = list(parameters.keys())
         target_family.append(targets)
         union |= set(targets)
@@ -170,67 +162,63 @@ for i, (scm, interventions) in enumerate(info['cases']):
     ground_truth_skeletons[i] = gnies.utils.skeleton(dag)
     print("    done.\n")
 
-ground_truths = {'skeletons': ground_truth_skeletons,
-                 'classes': ground_truth_classes,
-                 'dags': ground_truth_dags,
-                 'Is': ground_truth_Is}
+ground_truths = {
+    "skeletons": ground_truth_skeletons,
+    "classes": ground_truth_classes,
+    "dags": ground_truth_dags,
+    "Is": ground_truth_Is,
+}
 
 print("---------------------------------------------")
 print("Computing metrics")
 
 for method in methods:
     # Read the method's result file
-    method_info, results = utils.read_pickle(
-        args.directory + utils.compiled_results_filename(method))
+    method_info, results = utils.read_pickle(args.directory + utils.compiled_results_filename(method))
     print("\n  method = %s" % method)
     print("     which was run with settings")
     print("       ", method_info)
     # Load necessary estimates from the method
-    estimates = results['estimates']  # I-CPDAGs
-    I_estimates = results['I_estimates']  # Sets of intervention targets
+    estimates = results["estimates"]  # I-CPDAGs
+    I_estimates = results["I_estimates"]  # Sets of intervention targets
     method_metrics = {}  # results dictionary
     # ---------------------
     # Compute t1/t2 class metrics
     print("    computing class metrics")
     funs = [metrics.type_1_structc, metrics.type_2_structc]
-    class_metrics = compute_metrics(
-        estimates, ground_truth_classes, funs, all_dags, debug=True)
+    class_metrics = compute_metrics(estimates, ground_truth_classes, funs, all_dags, debug=True)
     method_metrics.update(class_metrics)
     # -------------------------
     # Compute skeleton recovery
     print("    computing skeleton metrics")
     funs = [metrics.type_1_skeleton, metrics.type_2_skeleton]
-    skeleton_metrics = compute_metrics(
-        estimates, ground_truth_skeletons, funs, gnies.utils.skeleton)
+    skeleton_metrics = compute_metrics(estimates, ground_truth_skeletons, funs, gnies.utils.skeleton)
     method_metrics.update(skeleton_metrics)
     # ------------------------------------
     # Compute intervention target recovery
     if not args.do:
         print("    computing intervention target metrics")
         funs = [metrics.type_1_I, metrics.type_2_I]
-        I_metrics = compute_metrics(
-            I_estimates, ground_truth_Is, funs, lambda I: I)
+        I_metrics = compute_metrics(I_estimates, ground_truth_Is, funs, lambda I: I)
         method_metrics.update(I_metrics)
     # ------------------------------------
     # Compute recovery of full I-MEC
     print("    computing recovery of full I-MEC")
     funs = [metrics.recovered_icpdag]
-    recovery_metric = compute_metrics(
-        estimates, ground_truth_icpdags, funs, lambda x: x)
+    recovery_metric = compute_metrics(estimates, ground_truth_icpdags, funs, lambda x: x)
     method_metrics.update(recovery_metric)
     # -----------------------------
     # Compute proportion of times that method produced an estimate
     print("    computing method success")
     funs = [metrics.success_metric]
-    success_metric = compute_metrics(
-        estimates, ground_truth_icpdags, funs, lambda x: x, noneify=False)
+    success_metric = compute_metrics(estimates, ground_truth_icpdags, funs, lambda x: x, noneify=False)
     method_metrics.update(success_metric)
     # -----------------------------
     # Compute elapsed times metrics
     print("    computing elapsed time")
-    method_metrics['times'] = results['times']
+    method_metrics["times"] = results["times"]
     # Store results for this method
-    path = args.directory + 'metrics_%s.pickle' % method
+    path = args.directory + "metrics_%s.pickle" % method
     print("  Saved results to", path)
     utils.write_pickle(path, (ground_truths, method_metrics))
 
