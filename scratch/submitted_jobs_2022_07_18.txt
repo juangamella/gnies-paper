@@ -1,0 +1,17 @@
+# Re-run GnIES without backward phase to see if memory issues come from that
+
+NOISE_DIRECTORY="/cluster/scratch/gajuan/synthetic_experiments/dataset_1657817021_runs:10_seed:42_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:noise_i_size:1_i_v_min:5_i_v_max:10_n:10,100,1000_obs:1/"
+DO_DIRECTORY="/cluster/scratch/gajuan/synthetic_experiments/dataset_1657817138_runs:10_seed:42_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:do_i_size:1_i_v_min:5_i_v_max:10_n:10,100,1000_obs:1/"
+
+# Run GnIES w. backward phase
+bsub -n 50 -W 72:00 python3 -m src.run_gnies --n_workers 49 --greedy --lambdas 0.01,0.25,0.5,0.75,1 --directory "/cluster/scratch/gajuan/synthetic_experiments/dataset_1657817021_runs:10_seed:42_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:noise_i_size:1_i_v_min:5_i_v_max:10_n:10,100,1000_obs:1/"
+
+# Run GnIES w. backward phase
+bsub -n 50 -W 72:00 python3 -m src.run_gnies --n_workers 49 --greedy --lambdas 0.01,0.25,0.5,0.75,1 --directory "/cluster/scratch/gajuan/synthetic_experiments/dataset_1657817138_runs:10_seed:42_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:do_i_size:1_i_v_min:5_i_v_max:10_n:10,100,1000_obs:1/"
+
+
+
+## Run with rank forward
+
+bsub -n 50 -W 12:00 python3 -m src.run_gnies --n_workers 49 --rank --lambdas 0.01,0.25,0.5,0.75,1 --directory "/cluster/scratch/gajuan/synthetic_experiments/dataset_rank_comparison_do"
+bsub -n 50 -W 12:00 python3 -m src.run_gnies --n_workers 49 --rank --lambdas 0.01,0.25,0.5,0.75,1 --directory "/cluster/scratch/gajuan/synthetic_experiments/dataset_rank_comparison_noise"
