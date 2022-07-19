@@ -9,5 +9,5 @@ install.packages(c("gsl", "energy"))
 install.packages(c("pcalg"))
 install.packages(c("kpcalg"))
 
-
-
+# Dependencies for DRF
+install.packages("drf")
