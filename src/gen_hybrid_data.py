@@ -32,19 +32,36 @@
 distributional random forests (https://arxiv.org/pdf/2005.14458.pdf).
 
 """
-
+import argparse
 import numpy as np
 import pandas as pd
 import gnies.utils
 import copy
 import time
+import os
 import drf
+import src.utils as utils
+import gc
+
+# --------------------------------------------------------------------
+# Auxiliary functions, BayesianNetwork class
 
 _GRAPH_TYPE_ERROR = "graph must be a 2-dimensional numpy.ndarray"
 _DATA_TYPE_ERROR = "data must be a list of 2-dimensional numpy.ndarray"
 _N_TYPE_ERROR = "n must be a positive int or list of positive ints"
 _BOOTSTRAP_TYPE_ERROR = "data must be a 1-dimension numpy.ndarray"
 # TODO: Docstrings
+
+
+def load_data(path, normalize=False):
+    f = np.load(path)
+    data = list(f.values())
+    if normalize:
+        pooled = np.vstack(data)
+        mean = pooled.mean(axis=0)
+        std = pooled.std(axis=0)
+        data = [(X - mean) / std for X in data]
+    return data
 
 
 def bootstrap(n, data, random_state=None):
@@ -104,7 +121,7 @@ class BayesianNetwork:
         self._random_forests = np.empty((self.p, self.e), dtype=object)
         for i in range(self.p):
             parents = gnies.utils.pa(i, self.graph)
-            print("  node %d/%d - parents %s" % (i + 1, self.p, parents)) if verbose else None
+            print("  node %d/%d - parents %s     " % (i + 1, self.p, parents)) if verbose else None
             # Don't fit a DRF if node is a source node
             if parents != set():
                 for k in range(self.e):
@@ -154,23 +171,88 @@ class BayesianNetwork:
 # --------------------------------------------------------------------
 # Run experiments
 
+# --------------------------------------------------------------------
+# Parse input parameters
 
-if __name__ == "__main__":
-    import src.sachs as sachs
+# Definitions and default settings
+arguments = {
+    # Execution parameters
+    "cluster": {"default": False, "type": bool},
+    "runs": {"default": 10, "type": int},
+    "seed": {"default": 42, "type": int},
+    "tag": {"type": str},
+    "debug": {"default": False, "type": bool},
+    # Sampling parameters
+    "standardize": {"type": bool, "default": False},
+    "dataset": {"type": str},
+    "graph": {"type": str},
+    "n": {"default": "10", "type": str},
+}
 
-    data = sachs.load_data()
-    graph = sachs.dag_consensus
-    network = BayesianNetwork(graph, data, True)
-    # Test
-    data = network.sample(100)
-    print(data)
-    for sample in data:
-        print(sample.shape)
-    # Test
-    Ns = list(range(1, network.e + 1))
-    print(Ns)
-    print([type(i) for i in Ns])
-    data = network.sample(Ns)
-    print(data)
-    for sample in data:
-        print(sample.shape)
+# Parse settings from input
+parser = argparse.ArgumentParser(description="Run experiments")
+for name, params in arguments.items():
+    if params["type"] == bool:
+        options = {"action": "store_true"}
+    else:
+        options = {"action": "store", "type": params["type"]}
+    if "default" in params:
+        options["default"] = params["default"]
+    parser.add_argument("--" + name, dest=name, required=False, **options)
+
+args = parser.parse_args()
+
+# Parameters that will be excluded from the filename (see parameter_string function above)
+excluded_keys = ["debug", "cluster", "dataset", "graph"]
+
+print(args)  # For debugging
+
+# --------------------------------------------------------------------
+# Set up directory
+
+directory = "hybrid_experiments/dataset_%d%s/" % (time.time(), utils.parameter_string(args, excluded_keys))
+
+# If running on the Euler cluster, store results in the scratch directory
+if args.cluster:
+    directory = "/cluster/scratch/gajuan/" + directory
+
+os.makedirs(directory)
+
+# Load graph and dataset, and store relevant information
+graph = np.load(args.graph)
+data = load_data(args.dataset, normalize=args.standardize)
+Ns = sorted([int(n) for n in args.n.split(",")])
+to_save = {"dataset": args.dataset, "runs": args.runs, "Ns": Ns, "args": args, "graph": graph}
+
+filename = directory + utils.INFO_FILENAME
+utils.write_pickle(filename, to_save)
+print('\nSaved test cases + info to "%s"' % filename)
+
+
+# --------------------------------------------------
+# Generate data for each run
+
+network = BayesianNetwork(graph, data, verbose=True)
+
+print("---------------------------------")
+print("Graph\n")
+for row in network.graph:
+    print(" " * 5, (row != 0).astype(int))
+print()
+
+for n in Ns:
+    start = time.time()
+    print("---------------------------------")
+    print("Generating datasets for n=%d" % n)
+    print("    generating data for run:")
+    print(" " * 5, end="")
+    for r in range(args.runs):
+        print(r, end=" ")
+        data = network.sample(n, random_state=args.seed)
+        path = directory + utils.test_case_filename(n, 0, r)
+        utils.data_to_bin(data, path, debug=args.debug)
+        del data
+        gc.collect()
+    print("  done in %0.2f seconds" % (time.time() - start))
+
+print('Stored dataset in "%s"' % directory)
