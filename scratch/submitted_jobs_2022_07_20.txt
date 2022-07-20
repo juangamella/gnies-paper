@@ -1,3 +1,11 @@
 # Locally
 
 python3 -m src.gen_hybrid_data --n 10,100,1000 --tag sachs_consensus --dataset datasets/sachs/sachs_data.npz --graph datasets/sachs/consensus.npy
+
+python3 -m src.generate_synthetic_data --n 10,100,1000 --G 1 --runs 1 --p 10 --tag for_hybrid
+
+python3 -m src.gen_hybrid_data --n 10,100,1000 --tag gaussian_1000 --dataset scratch/gaussian_dataset/test_case_n:1000_g:0_r:0.npy --graph scratch/gaussian_dataset/true_graph.npy
+python3 -m src.gen_hybrid_data --n 10,100,1000 --tag gaussian_100 --dataset scratch/gaussian_dataset/test_case_n:100_g:0_r:0.npy --graph scratch/gaussian_dataset/true_graph.npy
+python3 -m src.gen_hybrid_data --n 10,100,1000 --tag gaussian_10 --dataset scratch/gaussian_dataset/test_case_n:10_g:0_r:0.npy --graph scratch/gaussian_dataset/true_graph.npy
+
+
