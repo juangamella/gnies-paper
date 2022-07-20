@@ -55,7 +55,10 @@ _BOOTSTRAP_TYPE_ERROR = "data must be a 1-dimension numpy.ndarray"
 
 def load_data(path, normalize=False):
     f = np.load(path)
-    data = list(f.values())
+    if isinstance(f, np.ndarray):  # supposedly .npy file
+        data = list(f)
+    else:  # supposedly .npz file
+        data = list(f.values())
     if normalize:
         pooled = np.vstack(data)
         mean = pooled.mean(axis=0)
@@ -125,7 +128,8 @@ class BayesianNetwork:
             # Don't fit a DRF if node is a source node
             if parents != set():
                 for k in range(self.e):
-                    print("    fitting environment %d/%d" % (k + 1, self.e), end="  \r") if verbose else None
+                    print("    fitting environment %d/%d" %
+                          (k + 1, self.e), end="  \r") if verbose else None
                     # Using default values from DRF repository
                     DRF = drf.drf(min_node_size=15, num_trees=2000, splitting_rule="FourierMMD")
                     Y = pd.DataFrame(self._data[k][:, i])
@@ -210,7 +214,8 @@ print(args)  # For debugging
 # --------------------------------------------------------------------
 # Set up directory
 
-directory = "hybrid_experiments/dataset_%d%s/" % (time.time(), utils.parameter_string(args, excluded_keys))
+directory = "hybrid_experiments/dataset_%d%s/" % (time.time(),
+                                                  utils.parameter_string(args, excluded_keys))
 
 # If running on the Euler cluster, store results in the scratch directory
 if args.cluster:
