@@ -201,11 +201,17 @@ def run_method(info, debug=False):
     # Compute penalization parameter
     N = sum([len(X) for X in data])
     lmbda = info["l"] * np.log(N)
+    # Set initial set of interventions
+    if gnies_phases[0] == 'backward':
+        I0 = set(range(p))
+    else:
+        I0 = set()
     # Run method
     start = time.time()
-    output = gnies.fit(data, ges_lambda=lmbda, **gnies_options)
+    output = gnies.fit(data, I0=I0, ges_lambda=lmbda, **gnies_options)
     elapsed = time.time() - start
-    print("  Ran GnIES on test case %s in %0.2f seconds." % (utils.serialize_dict(info), elapsed)) if debug else None
+    print("  Ran GnIES on test case %s in %0.2f seconds." %
+          (utils.serialize_dict(info), elapsed)) if debug else None
     # Store results
     score, estimated_icpdag, estimated_I = output
     result = {
@@ -315,6 +321,7 @@ if not args.compile_only:
             pool.map(worker, iterable, chunksize=args.chunksize)
 
     end = time.time()
-    print("\n\nFinished experiments at %s (elapsed %0.2f seconds)\n\n" % (datetime.now(), end - start))
+    print("\n\nFinished experiments at %s (elapsed %0.2f seconds)\n\n" %
+          (datetime.now(), end - start))
 
 process_results()
