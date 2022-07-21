@@ -35,6 +35,8 @@ import numpy as np
 import pandas as pd
 import gnies.utils
 import src.utils as utils
+import argparse
+import os
 
 DATA_PATH = "datasets/sachs/"
 PATH = "sachs_experiments/"
@@ -54,7 +56,8 @@ filenames = [
 ]
 
 node_names = ["RAF", "MEK", "ERK", "PLcg", "PIP2", "PIP3", "PKC", "AKT", "PKA", "JNK", "P38"]
-var_names = ["praf", "pmek", "p44/42", "plcg", "PIP2", "PIP3", "PKC", "pakts473", "PKA", "pjnk", "P38"]
+var_names = ["praf", "pmek", "p44/42", "plcg", "PIP2",
+             "PIP3", "PKC", "pakts473", "PKA", "pjnk", "P38"]
 
 nodes_vars = dict(zip(node_names, var_names))
 
@@ -143,7 +146,8 @@ dag_mooij = np.array(
 
 DAGs = []
 
-DAGs += [("consensus", dag_consensus), ("eaton", dag_eaton), ("reconstructed", dag_reconstructed), ("mooij", dag_mooij)]
+DAGs += [("consensus", dag_consensus), ("eaton", dag_eaton),
+         ("reconstructed", dag_reconstructed), ("mooij", dag_mooij)]
 
 for i, dag in enumerate(gnies.utils.all_dags(cpdag_icp)):
     DAGs.append(("dantzig-%d" % (i + 1), dag))
@@ -177,13 +181,24 @@ def load_data(normalize=True):
     return data
 
 
-# --------------------------------------------------------------------
-# Run experiments
-
-
-if __name__ == "__main__":
-    splits = list(range(50))
-    # Run without pruning
-    run_multisplit_experiments(prune_edges=True, splits=splits)
-    # Run with pruning
-    run_multisplit_experiments(prune_edges=False, splits=splits)
+def prepare_dataset_directory(path, dag_name, normalize=False):
+    path += "" if path[-1] == "/" else "/"
+    os.makedirs(path)
+    data = load_data(normalize)
+    n = 800  # Just used for the filenames
+    # Write data
+    filename = path + utils.test_case_filename(n, 0, 0)
+    utils.data_to_bin(data, path + utils.test_case_filename(n, 0, 0), debug=True)
+    # Write test case info
+    graph = dict(DAGs)[dag_name]
+    args = argparse.Namespace()
+    args.p = len(graph)
+    to_save = {"n_cases": 1, "cases": [graph], "runs": 1, "Ns": [n], "args": args,
+               "graph": graph}
+    filename = path + utils.INFO_FILENAME
+    utils.write_pickle(filename, to_save)
+    print('  saved test case info to "%s"' % filename)
+    # Write test_case_graph
+    filename = path + "consensus_graph"
+    utils.data_to_bin(graph, filename, debug=False)
+    print('  saved test graph to "%s"' % filename)

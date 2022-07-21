@@ -75,6 +75,7 @@ arguments = {
     "seed": {"default": 42, "type": int},
     "tag": {"type": str},
     "debug": {"default": False, "type": bool},
+    "directory": {"default": "hybrid_experiments/", "type": str},
     # Sampling parameters
     "type": {"type": str, "default": "drf"},
     "standardize": {"type": bool, "default": False},
@@ -102,10 +103,11 @@ excluded_keys = ["debug", "cluster", "dataset", "graph"]
 print(args)  # For debugging
 
 # --------------------------------------------------------------------
-# Set up directory
+# Set up the directory to store generated data
 
-directory = "hybrid_experiments/dataset_%d%s/" % (time.time(),
-                                                  utils.parameter_string(args, excluded_keys))
+args.directory += "" if args.directory[-1] == "/" else "/"
+directory = args.directory + "dataset_%d%s/" % (time.time(),
+                                                utils.parameter_string(args, excluded_keys))
 
 # If running on the Euler cluster, store results in the scratch directory
 if args.cluster:

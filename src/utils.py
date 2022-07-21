@@ -73,7 +73,11 @@ def read_pickle(filename):
 
 
 def load_bin(path):
-    return np.load(path + '.npy', allow_pickle=False)
+    try:
+        return list(np.load(path + '.npy', allow_pickle=False))
+    except FileNotFoundError:
+        f = np.load(path + '.npz')
+        return list(f.values())
 
 
 def hyperparameter_range(lo, hi, num):
@@ -117,9 +121,14 @@ def pooled_data_to_csv(data, path, debug, normalize=False):
 
 
 def data_to_bin(data, path, debug):
-    filename = path + '.npy'
+    if isinstance(data, list):
+        # Save in an npz file
+        filename = path + '.npz'
+        np.savez(path, *data)
+    elif isinstance(data, np.ndarray):
+        filename = path + '.npy'
+        np.save(path, data)
     print('  saved test case data to "%s"' % filename) if debug else None
-    np.save(path, data)
 
 
 def serialize_dict(dictionary, excluded_keys=[]):
