@@ -34,14 +34,11 @@ distributional random forests (https://arxiv.org/pdf/2005.14458.pdf).
 """
 import argparse
 import numpy as np
-import pandas as pd
-import gnies.utils
-import copy
 import time
 import os
-import drf
 import src.utils as utils
 import gc
+from src.bayesian_networks import DRFNetwork, GaussianNetwork
 
 # --------------------------------------------------------------------
 # Auxiliary functions, BayesianNetwork class
@@ -66,117 +63,9 @@ def load_data(path, normalize=False):
         data = [(X - mean) / std for X in data]
     return data
 
-
-def bootstrap(n, data, random_state=None):
-    """
-    """
-    # Check inputs
-    if not isinstance(data, np.ndarray):
-        raise TypeError(_BOOTSTRAP_TYPE_ERROR)
-    elif data.ndim != 1:
-        raise ValueError(_BOOTSTRAP_TYPE_ERROR)
-
-    # Sample with replacement
-    rng = np.random.default_rng(random_state)
-    sample = rng.choice(data, n, replace=True)
-    return sample
-
-
-class BayesianNetwork:
-    def __init__(self, graph, data, verbose=False):
-        # Check inputs: graph
-        if not isinstance(graph, np.ndarray):
-            raise TypeError(_GRAPH_TYPE_ERROR)
-        elif graph.ndim != 2:
-            raise ValueError(_GRAPH_TYPE_ERROR)
-        elif not gnies.utils.is_dag(graph):
-            raise ValueError("graph is not a DAG.")
-
-        # Check inputs: data
-        if not isinstance(data, list):
-            raise TypeError(_DATA_TYPE_ERROR)
-        else:
-            for sample in data:
-                # Check every sample is a numpy.ndarray
-                if not isinstance(sample, np.ndarray):
-                    raise TypeError(_DATA_TYPE_ERROR)
-                # with two dimensions
-                elif sample.ndim != 2:
-                    raise ValueError(_DATA_TYPE_ERROR)
-                # and the number of variables matches that in the graph
-                elif sample.shape[1] != graph.shape[1]:
-                    raise ValueError("graph and data have different number of variables")
-
-        # Set parameters
-        self.graph = (graph != 0).astype(int)
-        self._data = copy.deepcopy(data)
-        self.p = graph.shape[1]
-        self.e = len(self._data)
-        self.Ns = [len(sample) for sample in self._data]
-        self._ordering = gnies.utils.topological_ordering(self.graph)
-
-        # Fit distributional random forests, i.e. one per (node with
-        # parents) x environment
-        if verbose:
-            start = time.time()
-            print("-------------------------------------")
-            print("Fitting distributional random forests")
-        self._random_forests = np.empty((self.p, self.e), dtype=object)
-        for i in range(self.p):
-            parents = gnies.utils.pa(i, self.graph)
-            print("  node %d/%d - parents %s     " % (i + 1, self.p, parents)) if verbose else None
-            # Don't fit a DRF if node is a source node
-            if parents != set():
-                for k in range(self.e):
-                    print("    fitting environment %d/%d" %
-                          (k + 1, self.e), end="  \r") if verbose else None
-                    # Using default values from DRF repository
-                    DRF = drf.drf(min_node_size=15, num_trees=2000, splitting_rule="FourierMMD")
-                    Y = pd.DataFrame(self._data[k][:, i])
-                    X = pd.DataFrame(self._data[k][:, sorted(parents)])
-                    DRF.fit(X, Y)
-                    # print(DRF.info())
-                    self._random_forests[i, k] = DRF
-        print("Done in %0.2f seconds           " % (time.time() - start)) if verbose else None
-
-    def sample(self, n, random_state=None):
-        # Check input: n
-        if type(n) not in [int, list]:
-            raise TypeError(_N_TYPE_ERROR)
-        elif type(n) == int and n <= 0:
-            raise ValueError(_N_TYPE_ERROR)
-        elif type(n) == list:
-            for i in n:
-                if type(i) != int:
-                    raise TypeError(_N_TYPE_ERROR)
-                elif i <= 0:
-                    raise ValueError(_N_TYPE_ERROR)
-
-        n = [n] * self.e if type(n) == int else n
-
-        # Generate a sample for each environment
-        sampled_data = []
-        for k in range(self.e):
-            sample = np.zeros((n[k], self.p), dtype=float)
-            for i in self._ordering:
-                if self._random_forests[i, k] is None:
-                    # Node has no parents, generate a sample using bootstrapping
-                    sample[:, i] = bootstrap(n[k], self._data[k][:, i], random_state=random_state)
-                else:
-                    parents = gnies.utils.pa(i, self.graph)
-                    new_data = pd.DataFrame(sample[:, sorted(parents)])
-                    forest = self._random_forests[i, k]
-                    output = forest.predict(n=1, functional="sample", newdata=new_data)
-                    sample[:, i] = output.sample[:, 0, 0]
-            sampled_data.append(sample)
-        return sampled_data
-
-
-# --------------------------------------------------------------------
-# Run experiments
-
 # --------------------------------------------------------------------
 # Parse input parameters
+
 
 # Definitions and default settings
 arguments = {
@@ -187,6 +76,7 @@ arguments = {
     "tag": {"type": str},
     "debug": {"default": False, "type": bool},
     # Sampling parameters
+    "type": {"type": str, "default": "drf"},
     "standardize": {"type": bool, "default": False},
     "dataset": {"type": str},
     "graph": {"type": str},
@@ -227,7 +117,9 @@ os.makedirs(directory)
 graph = np.load(args.graph)
 data = load_data(args.dataset, normalize=args.standardize)
 Ns = sorted([int(n) for n in args.n.split(",")])
-to_save = {"dataset": args.dataset, "runs": args.runs, "Ns": Ns, "args": args, "graph": graph}
+args.p = len(graph)
+to_save = {"dataset": args.dataset, "n_cases": 1, "cases": [graph],
+           "runs": args.runs, "Ns": Ns, "args": args, "graph": graph}
 
 filename = directory + utils.INFO_FILENAME
 utils.write_pickle(filename, to_save)
@@ -237,7 +129,15 @@ print('\nSaved test cases + info to "%s"' % filename)
 # --------------------------------------------------
 # Generate data for each run
 
-network = BayesianNetwork(graph, data, verbose=True)
+if args.type == "drf":
+    network = DRFNetwork(graph, data, verbose=True)
+else:
+    network = GaussianNetwork(graph, data, verbose=True)
+
+print("---------------------------------")
+print("Data\n")
+print("Data has %d samples with sizes %s" % (network.e, network.Ns))
+
 
 print("---------------------------------")
 print("Graph\n")
