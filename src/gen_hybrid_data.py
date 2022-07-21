@@ -81,7 +81,7 @@ arguments = {
     "standardize": {"type": bool, "default": False},
     "dataset": {"type": str},
     "graph": {"type": str},
-    "n": {"default": "10", "type": str},
+    "n": {"type": str},
 }
 
 # Parse settings from input
@@ -118,7 +118,12 @@ os.makedirs(directory)
 # Load graph and dataset, and store relevant information
 graph = np.load(args.graph)
 data = load_data(args.dataset, normalize=args.standardize)
-Ns = sorted([int(n) for n in args.n.split(",")])
+# If no sample size is specified, replicate the sample size of the
+# data used to fit the network
+if args.n is None:
+    Ns = [-1]
+else:
+    Ns = sorted([int(n) for n in args.n.split(",")])
 args.p = len(graph)
 to_save = {"dataset": args.dataset, "n_cases": 1, "cases": [graph],
            "runs": args.runs, "Ns": Ns, "args": args, "graph": graph}
@@ -155,7 +160,7 @@ for n in Ns:
     print(" " * 5, end="")
     for r in range(args.runs):
         print(r, end=" ")
-        data = network.sample(n, random_state=args.seed)
+        data = network.sample(network.Ns if args.n is None else n, random_state=args.seed)
         path = directory + utils.test_case_filename(n, 0, r)
         utils.data_to_bin(data, path, debug=args.debug)
         del data
