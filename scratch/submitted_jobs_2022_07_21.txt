@@ -1,0 +1,38 @@
+######################################################################
+# Generate Gaussian/DRF hybrid datasets
+
+#python3 -m src.gen_hybrid_data --tag sachs_consensus --dataset sachs_experiments/real_dataset_dag:consensus/test_case_n:800_g:0_r:0.npz --graph sachs_experiments/real_dataset_dag:consensus/consensus_graph.npy --type gauss --runs 10 --directory sachs_experiments --cluster
+
+#bsub -n 1 -W 1:00 python3 -m src.gen_hybrid_data --tag sachs_consensus --dataset sachs_experiments/real_dataset_dag:consensus/test_case_n:800_g:0_r:0.npz --graph sachs_experiments/real_dataset_dag:consensus/consensus_graph.npy --type drf --runs 10 --directory sachs_experiments --cluster
+
+REAL_DIR="sachs_experiments/real_dataset_dag:consensus/"
+DRF_DIR="/cluster/scratch/gajuan/sachs_experiments/dataset_1658417465_runs:10_seed:42_tag:sachs_consensus_type:drf_standardize:0_n:None"
+GAUSS_DIR="/cluster/scratch/gajuan/sachs_experiments/dataset_1658417439_runs:10_seed:42_tag:sachs_consensus_type:gauss_standardize:0_n:None"
+
+
+######################################################################
+# Run methods on real dataset
+
+
+# bsub -n 6 -W 1:00 python3 -m src.run_gnies --n_workers 5 --phases b --lambdas 0.01,0.25,0.5,0.75,1 --directory $REAL_DIR
+
+# bsub -n 1 -W 1:00 python3 -m src.run_utigsp --n_workers 1 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory $REAL_DIR
+
+# bsub -n 1 -W 1:00 python3 -m src.run_ges --n_workers 1 --lambdas 0.01,0.25,0.5,0.75,1 --directory $REAL_DIR
+
+######################################################################
+# Run methods on Gaussian hybrid data
+
+# bsub -n 50 -W 1:00 python3 -m src.run_gnies --n_workers 49 --phases b --lambdas 0.01,0.25,0.5,0.75,1 --directory $GAUSS_DIR
+bsub -n 50 -W 24:00 python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1 --directory $GAUSS_DIR
+
+# bsub -n 50 -W 1:00 python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory $GAUSS_DIR
+
+# bsub -n 50 -W 1:00 python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1 --directory $GAUSS_DIR
+
+######################################################################
+# Run methods on DRF hybrid data
+
+bsub -n 50 -W 1:00 python3 -m src.run_gnies --n_workers 49 --phases b --lambdas 0.01,0.25,0.5,0.75,1 --directory $DRF_DIR
+bsub -n 50 -W 1:00 python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --director $DRF_DIR
+bsub -n 50 -W 1:00 python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1 --directory $DRF_DIR
