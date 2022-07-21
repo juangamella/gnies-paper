@@ -61,7 +61,8 @@ def compute_metrics(estimates, ground_truth, metric_functions, trans_function, n
     their score when compared to the ground truth"""
     assert len(ground_truth) == len(estimates)
     # Initialize the dictionary of arrays where results will be stored
-    computed_metrics = dict((metric, np.empty_like(estimates, dtype=float)) for metric in metric_functions)
+    computed_metrics = dict((metric, np.empty_like(estimates, dtype=float))
+                            for metric in metric_functions)
     # Iterate over each test case
     for i, case_estimates in enumerate(estimates):
         if debug:
@@ -72,10 +73,12 @@ def compute_metrics(estimates, ground_truth, metric_functions, trans_function, n
         # Compute the requested metrics for each transformed estimate
         for metric in metric_functions:
             metric_function = utils.if_none(metric, np.nan) if noneify else metric
-            case_results = [metric_function(estimate, ground_truth[i]) for estimate in transformed_estimates]
+            case_results = [metric_function(estimate, ground_truth[i])
+                            for estimate in transformed_estimates]
             # Store result in the corresponding array, reshaping the
             # flattened array of transformed estimates
-            computed_metrics[metric][i] = np.reshape(case_results, computed_metrics[metric][i].shape)
+            computed_metrics[metric][i] = np.reshape(
+                case_results, computed_metrics[metric][i].shape)
     # Return
     print() if debug else None
     return computed_metrics
@@ -129,27 +132,36 @@ ground_truth_classes = np.empty(n_cases, dtype=object)
 ground_truth_skeletons = np.empty(n_cases, dtype=object)
 ground_truth_Is = np.empty(n_cases, dtype=object)
 ground_truth_dags = np.empty(n_cases, dtype=object)
-for i, (scm, interventions) in enumerate(info["cases"]):
+for i, case in enumerate(info["cases"]):
     print("  case %d" % i)
-    print("    interventions :", interventions)
-    # Extract union of intervention targets
-    union = set()
-    target_family = []
-    # Note: interventions are [{intervention_type: {target: (mean, variance)}*}]
-    for intervention in interventions:
-        parameters = list(intervention.values())[0]
-        if parameters is None:
-            continue
-        targets = list(parameters.keys())
-        target_family.append(targets)
-        union |= set(targets)
+    if isinstance(case, np.ndarray) and case.ndim == 2:
+        singleton = True
+        dag = case
+        union = set(range(info['args'].p))
+    elif isinstance(case, tuple) and len(case) == 2:
+        singleton = False
+        (scm, interventions) = case
+        print("    interventions :", interventions)
+        dag = (scm.W != 0).astype(int)
+        union = set()
+        target_family = []
+        # Note: interventions are [{intervention_type: {target: (mean, variance)}*}]
+        for intervention in interventions:
+            parameters = list(intervention.values())[0]
+            if parameters is None:
+                continue
+            targets = list(parameters.keys())
+            target_family.append(targets)
+            union |= set(targets)
+    else:
+        raise Exception('info["cases"] is invalid')
     print("    union of targets :", union)
     ground_truth_Is[i] = union
-    # Extract true DAG
-    dag = (scm.W != 0).astype(int)
     ground_truth_dags[i] = dag
     # Compute the I-CPDAG
-    if args.do:
+    if singleton:
+        icpdag = dag
+    elif args.do:
         icpdag = gies.utils.replace_unprotected(dag, target_family)
     else:
         icpdag = gnies.utils.dag_to_icpdag(dag, union)
@@ -174,7 +186,8 @@ print("Computing metrics")
 
 for method in methods:
     # Read the method's result file
-    method_info, results = utils.read_pickle(args.directory + utils.compiled_results_filename(method))
+    method_info, results = utils.read_pickle(
+        args.directory + utils.compiled_results_filename(method))
     print("\n  method = %s" % method)
     print("     which was run with settings")
     print("       ", method_info)
@@ -192,7 +205,8 @@ for method in methods:
     # Compute skeleton recovery
     print("    computing skeleton metrics")
     funs = [metrics.type_1_skeleton, metrics.type_2_skeleton]
-    skeleton_metrics = compute_metrics(estimates, ground_truth_skeletons, funs, gnies.utils.skeleton)
+    skeleton_metrics = compute_metrics(
+        estimates, ground_truth_skeletons, funs, gnies.utils.skeleton)
     method_metrics.update(skeleton_metrics)
     # ------------------------------------
     # Compute intervention target recovery
@@ -211,7 +225,8 @@ for method in methods:
     # Compute proportion of times that method produced an estimate
     print("    computing method success")
     funs = [metrics.success_metric]
-    success_metric = compute_metrics(estimates, ground_truth_icpdags, funs, lambda x: x, noneify=False)
+    success_metric = compute_metrics(estimates, ground_truth_icpdags,
+                                     funs, lambda x: x, noneify=False)
     method_metrics.update(success_metric)
     # -----------------------------
     # Compute elapsed times metrics

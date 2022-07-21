@@ -47,11 +47,11 @@ def success_metric(estimate, truth):
 
 
 def type_1_struct(estimate, truth):
-    true_imec = _imec(truth)
-    print("Enumerated true imec: %d graphs" % len(true_imec))
-    estimated_imec = _imec(estimate)
-    print("Enumerated estimated imec: %d graphs" % len(estimated_imec))
-    return type_1_structc(estimated_imec, true_imec)
+    true_class = utils.all_dags(truth)
+    print("Enumerated true class: %d graphs" % len(true_class))
+    estimated_class = utils.all_dags(estimate)
+    print("Enumerated estimated class: %d graphs" % len(estimated_class))
+    return type_1_structc(estimated_class, true_class)
 
 
 def type_1_structc(estimated_class, true_class):
@@ -59,11 +59,11 @@ def type_1_structc(estimated_class, true_class):
 
 
 def type_2_struct(estimate, truth):
-    true_imec = _imec(truth)
-    print("Enumerated true imec: %d graphs" % len(true_imec))
-    estimated_imec = _imec(estimate)
-    print("Enumerated estimated imec: %d graphs" % len(estimated_imec))
-    return type_2_structc(estimated_imec, true_imec)
+    true_class = utils.all_dags(truth)
+    print("Enumerated true class: %d graphs" % len(true_class))
+    estimated_class = utils.all_dags(estimate)
+    print("Enumerated estimated class: %d graphs" % len(estimated_class))
+    return type_2_structc(estimated_class, true_class)
 
 
 def type_2_structc(estimated_class, true_class):
