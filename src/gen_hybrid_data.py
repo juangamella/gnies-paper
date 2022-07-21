@@ -98,7 +98,7 @@ for name, params in arguments.items():
 args = parser.parse_args()
 
 # Parameters that will be excluded from the filename (see parameter_string function above)
-excluded_keys = ["debug", "cluster", "dataset", "graph"]
+excluded_keys = ["debug", "cluster", "dataset", "graph", "directory"]
 
 print(args)  # For debugging
 
