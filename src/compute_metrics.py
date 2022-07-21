@@ -134,10 +134,12 @@ ground_truth_Is = np.empty(n_cases, dtype=object)
 ground_truth_dags = np.empty(n_cases, dtype=object)
 for i, case in enumerate(info["cases"]):
     print("  case %d" % i)
+    # Ground truth is a single graph
     if isinstance(case, np.ndarray) and case.ndim == 2:
         singleton = True
         dag = case
         union = set(range(info['args'].p))
+    # Ground truth is an SCM + interventions
     elif isinstance(case, tuple) and len(case) == 2:
         singleton = False
         (scm, interventions) = case
@@ -153,8 +155,10 @@ for i, case in enumerate(info["cases"]):
             targets = list(parameters.keys())
             target_family.append(targets)
             union |= set(targets)
+    # Ground truth is not recognized
     else:
         raise Exception('info["cases"] is invalid')
+    # Compute and store ground truths corresponding to different metrics
     print("    union of targets :", union)
     ground_truth_Is[i] = union
     ground_truth_dags[i] = dag
