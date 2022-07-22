@@ -72,9 +72,11 @@ arguments = {
     'alpha_lo': {'default': 0.01, 'type': float},
     'alpha_hi': {'default': 0.01, 'type': float},
     'n_alphas': {'default': 1, 'type': int},
+    'alphas': {"type": str},
     'beta_lo': {'default': 0.01, 'type': float},
     'beta_hi': {'default': 0.01, 'type': float},
     'n_betas': {'default': 1, 'type': int},
+    'betas': {"type": str},
     'do': {'default': False, 'type': bool}
 }
 
@@ -122,14 +124,21 @@ print("Dataset contains a total of %d samples from %d cases at sample sizes %s f
 # Build iterable, result_matrix_shape, iterable entry to index function
 
 # Significance level for CI tests
-alphas = utils.hyperparameter_range(args.alpha_lo,
-                                    args.alpha_hi,
-                                    args.n_alphas)
+if args.alphas is not None:
+    alphas = sorted([float(a) for a in args.alphas.split(",")])
+else:
+    alphas = utils.hyperparameter_range(args.alpha_lo,
+                                        args.alpha_hi,
+                                        args.n_alphas)
 
 # Significance level for invariance tests
-betas = utils.hyperparameter_range(args.beta_lo,
-                                   args.beta_hi,
-                                   args.n_betas)
+if args.betas is not None:
+    betas = sorted([float(b) for b in args.betas.split(",")])
+else:
+    betas = utils.hyperparameter_range(args.beta_lo,
+                                       args.beta_hi,
+                                       args.n_betas)
+
 fields = [range(n_cases), alphas, betas, Ns, range(runs)]
 
 iterable = []
