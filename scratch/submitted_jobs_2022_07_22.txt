@@ -1,0 +1,23 @@
+######################################################################
+# Generate Gaussian/DRF hybrid datasets
+
+REAL_DIR="sachs_experiments/real_dataset_dag:consensus/"
+DRF_DIR="/cluster/scratch/gajuan/sachs_experiments/dataset_1658417465_runs:10_seed:42_tag:sachs_consensus_type:drf_standardize:0_n:None"
+GAUSS_DIR="/cluster/scratch/gajuan/sachs_experiments/dataset_1658417439_runs:10_seed:42_tag:sachs_consensus_type:gauss_standardize:0_n:None"
+
+
+######################################################################
+# Run methods on real dataset
+
+bsub -n 1 -W 1:00 python3 -m src.run_utigsp --n_workers 1 --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-20" --directory $REAL_DIR
+
+######################################################################
+# Run methods on Gaussian hybrid data
+
+bsub -n 50 -W 1:00 python3 -m src.run_utigsp --n_workers 49 --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-20" --directory $GAUSS_DIR
+
+######################################################################
+# Run methods on DRF hybrid data
+
+
+bsub -n 50 -W 1:00 python3 -m src.run_utigsp --n_workers 49 --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-20" --directory $DRF_DIR
