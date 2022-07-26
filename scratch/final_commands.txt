@@ -1,0 +1,3 @@
+ - Latest synthetics are in submitted_jobs_2022_07_25
+ - Sachs experiments are on submitted_jobs_2022_07_21.txt
+ - Experiments to see the effect of additional intervention targets are in submitted_jobs_2022_07_25.txt

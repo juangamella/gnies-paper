@@ -1,0 +1,25 @@
+# Evaluating the effect of different additional interventions
+
+## For noise interventions
+python3 -m src.generate_synthetic_data --cluster --G 100 --runs 10 --n 10,100,1000 --i_size 0 --e 4 --p 10 --i_type noise --obs --tag I0
+python3 -m src.generate_synthetic_data --cluster --G 100 --runs 10 --n 10,100,1000 --i_size 2 --e 4 --p 10 --i_type noise --obs --tag I6
+python3 -m src.generate_synthetic_data --cluster --G 100 --runs 10 --n 10,100,1000 --i_size 3 --e 4 --p 10 --i_type noise --obs --tag I9
+
+DIR_0="/cluster/scratch/gajuan/synthetic_experiments/dataset_1658764985_runs:10_seed:42_tag:I0_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:noise_i_size:0_i_v_min:5_i_v_max:10_n:10,100,1000_obs:1/"
+DIR_6="/cluster/scratch/gajuan/synthetic_experiments/dataset_1658765052_runs:10_seed:42_tag:I6_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:noise_i_size:2_i_v_min:5_i_v_max:10_n:10,100,1000_obs:1/"
+DIR_9="/cluster/scratch/gajuan/synthetic_experiments/dataset_1658765161_runs:10_seed:42_tag:I9_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:noise_i_size:3_i_v_min:5_i_v_max:10_n:10,100,1000_obs:1/"
+
+# Run GnIES (only forward phase)
+bsub -n 50 -W 30:00 python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1 --directory $DIR_0
+bsub -n 50 -W 50:00 python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1 --directory $DIR_6
+bsub -n 50 -W 30:00 python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1 --directory $DIR_9 --phases b
+
+# Run UT-IGSP
+bsub -n 50 -W 1:00 python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory $DIR_0
+bsub -n 50 -W 1:00 python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory $DIR_6
+bsub -n 50 -W 1:00 python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory $DIR_9
+
+# Run GES as baseline
+bsub -n 50 -W 1:00 python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1 --directory $DIR_0
+bsub -n 50 -W 1:00 python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1 --directory $DIR_6
+bsub -n 50 -W 1:00 python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1 --directory $DIR_9
