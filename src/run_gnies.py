@@ -116,6 +116,10 @@ if args.lambdas is None:
 else:
     excluded_keys += ["lambda_lo", "lambda_hi", "n_lambdas"]
 
+# Modify method name to reflect rank/phases
+METHOD_NAME += "_" + args.phases
+if args.rank:
+    METHOD_NAME += "_" + "rank"
 
 # --------------------------------------------------------------------
 # Run algorithm on samples

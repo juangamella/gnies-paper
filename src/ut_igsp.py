@@ -28,8 +28,8 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from causaldag.utils.ci_tests import gauss_ci_suffstat, gauss_ci_test, MemoizedCI_Tester
-from causaldag.utils.invariance_tests import gauss_invariance_suffstat, gauss_invariance_test, MemoizedInvarianceTester
+from causaldag.utils.ci_tests import gauss_ci_suffstat, gauss_ci_test, hsic_test, MemoizedCI_Tester
+from causaldag.utils.invariance_tests import gauss_invariance_suffstat, gauss_invariance_test, hsic_invariance_test, MemoizedInvarianceTester
 from causaldag import unknown_target_igsp
 
 import gnies.utils as utils
@@ -39,22 +39,30 @@ import gies.utils
 # TODO: icpdag=True here conflicts with the call from run_ut_igsp, refactor
 
 
-def fit(data, alpha_ci, alpha_inv, debug=0, completion='gnies'):
+def fit(data, alpha_ci, alpha_inv, debug=0, completion='gnies', test='hsic'):
     observational_sample = data[0]
     interventional_samples = data[1:]
     p = observational_sample.shape[1]
     nodes = set(range(p))
-    # Form sufficient statistics
-    ci_suffstat = gauss_ci_suffstat(observational_sample)
-    invariance_suffstat = gauss_invariance_suffstat(observational_sample,
-                                                    interventional_samples)
-    # Create conditional independence tester and invariance tester
-    ci_tester = MemoizedCI_Tester(gauss_ci_test,
-                                  ci_suffstat,
-                                  alpha=alpha_ci)
-    invariance_tester = MemoizedInvarianceTester(gauss_invariance_test,
-                                                 invariance_suffstat,
-                                                 alpha=alpha_inv)
+    # Build sufficient statistics and tests
+    if test == 'gauss':
+        # Form sufficient statistics
+        ci_suffstat = gauss_ci_suffstat(observational_sample)
+        invariance_suffstat = gauss_invariance_suffstat(observational_sample,
+                                                        interventional_samples)
+        # Create conditional independence tester and invariance tester
+        ci_tester = MemoizedCI_Tester(gauss_ci_test,
+                                      ci_suffstat,
+                                      alpha=alpha_ci)
+        invariance_tester = MemoizedInvarianceTester(gauss_invariance_test,
+                                                     invariance_suffstat,
+                                                     alpha=alpha_inv)
+    elif test == 'hsic':
+        ci_tester = MemoizedCI_Tester(hsic_test, observational_sample, alpha=alpha_ci)
+        suffstat = dict((i, sample) for i, sample in enumerate(interventional_samples))
+        suffstat['obs_samples'] = observational_sample
+        invariance_tester = MemoizedInvarianceTester(
+            hsic_invariance_test, suffstat, alpha=alpha_inv)
     # Run UT-IGSP
     setting_list = [dict(known_interventions=[])] * (len(data) - 1)
     estimated_dag, est_targets_list = unknown_target_igsp(

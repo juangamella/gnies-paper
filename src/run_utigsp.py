@@ -77,7 +77,8 @@ arguments = {
     'beta_hi': {'default': 0.01, 'type': float},
     'n_betas': {'default': 1, 'type': int},
     'betas': {"type": str},
-    'do': {'default': False, 'type': bool}
+    'do': {'default': False, 'type': bool},
+    'test': {'default': 'gauss', 'type': str}
 }
 
 # Parse settings from input
@@ -103,6 +104,9 @@ excluded_keys = [
     'n_workers',
     'compile_only'
 ]
+
+METHOD_NAME += "_" + args.test
+METHOD_NAME_PLUS += "_" + args.test
 
 # --------------------------------------------------------------------
 # Run algorithm on samples
@@ -184,7 +188,7 @@ def run_method(info, debug=False):
     # Run method
     start = time.time()
     output = ut_igsp.fit(
-        data, alpha_ci=info['a'], alpha_inv=info['b'], completion='gies' if args.do else 'gnies')
+        data, alpha_ci=info['a'], alpha_inv=info['b'], completion='gies' if args.do else 'gnies', test=args.test)
     elapsed = time.time() - start
     print("  Ran UT-IGSP on test case %s in %0.2f seconds." %
           (utils.serialize_dict(info), elapsed)) if debug else None
