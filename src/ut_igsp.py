@@ -63,6 +63,8 @@ def fit(data, alpha_ci, alpha_inv, debug=0, completion='gnies', test='hsic'):
         suffstat['obs_samples'] = observational_sample
         invariance_tester = MemoizedInvarianceTester(
             hsic_invariance_test, suffstat, alpha=alpha_inv)
+    else:
+        raise ValueError('Invalid value "%s" for field "test"' % test)
     # Run UT-IGSP
     setting_list = [dict(known_interventions=[])] * (len(data) - 1)
     estimated_dag, est_targets_list = unknown_target_igsp(
