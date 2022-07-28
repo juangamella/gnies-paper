@@ -51,7 +51,6 @@ dag_consensus = np.array(
 )
 
 filenames = ['iv=.txt', 'iv=1.txt', 'iv=3.txt', 'iv=4.txt', 'iv=6.txt', 'iv=8.txt']
-filenames = ['iv=.txt', 'iv=1.txt', 'iv=3.txt', 'iv=4.txt', 'iv=6.txt', 'iv=8.txt']
 
 node_names = ["RAF", "MEK", "ERK", "PLcg", "PIP2", "PIP3", "PKC", "AKT", "PKA", "JNK", "P38"]
 var_names = ['Raf', 'Mek', 'Erk', 'PLCg', 'PIP2', 'PIP3', 'PKC', 'Akt', 'PKA', 'JNK', 'p38']
@@ -72,27 +71,6 @@ np.savez("sachs_data_wang_2017", *data)
 print("Observations:", [len(X) for X in data])
 print("Should match:", expected_observations)
 print(" ", [len(X) for X in data] == expected_observations)
+print("Observations:", [(target, len(X)) for target,X in zip(target_names, data)])
 
 print('Compiled data into "sachs_data_wang_2017"')
-
-# print('Preparing directory for evaluation - ground truth is consensus graph')
-
-# os.makedirs('real_dataset_wang_2017_dag:consensus')
-#     data = load_data(normalize)
-#     n = 800  # Just used for the filenames
-#     # Write data
-#     filename = path + utils.test_case_filename(n, 0, 0)
-#     utils.data_to_bin(data, path + utils.test_case_filename(n, 0, 0), debug=True)
-#     # Write test case info
-#     graph = dict(DAGs)[dag_name]
-#     args = argparse.Namespace()
-#     args.p = len(graph)
-#     to_save = {"n_cases": 1, "cases": [graph], "runs": 1, "Ns": [n], "args": args,
-#                "graph": graph}
-#     filename = path + utils.INFO_FILENAME
-#     utils.write_pickle(filename, to_save)
-#     print('  saved test case info to "%s"' % filename)
-#     # Write test_case_graph
-#     filename = path + "consensus_graph"
-#     utils.data_to_bin(graph, filename, debug=False)
-#     print('  saved test graph to "%s"' % filename)
