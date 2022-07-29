@@ -33,58 +33,59 @@
 
 import numpy as np
 import pandas as pd
-import sachs
 import time
+import sachs
 
-DATA_PATH = "sachs/wang_2017/"
+_DATA_PATH = "sachs/sachs_2005/"
 
-filenames = [
-    'iv=.txt',
-    'iv=1.txt',
-    'iv=3.txt',
-    'iv=4.txt',
-    'iv=6.txt',
-    'iv=8.txt']
+# --------------------------------------------------------------------
+# Variable names
+
+_filenames = [
+    '1. cd3cd28.csv',
+    '2. cd3cd28icam2.csv',
+    '3. cd3cd28+aktinhib.csv',
+    '4. cd3cd28+g0076.csv',
+    '5. cd3cd28+psitect.csv',
+    '6. cd3cd28+u0126.csv',
+    '7. cd3cd28+ly.csv',
+    '8. pma.csv',
+    '9. b2camp.csv'
+]
+
+_var_names = ["praf", "pmek", "p44/42", "plcg", "PIP2", "PIP3", "PKC", "pakts473", "PKA", "pjnk", "P38"]
 
 NODE_NAMES = ["RAF", "MEK", "ERK", "PLcg", "PIP2", "PIP3", "PKC", "AKT", "PKA", "JNK", "P38"]
-var_names = ['Raf', 'Mek', 'Erk', 'PLCg', 'PIP2', 'PIP3', 'PKC', 'Akt', 'PKA', 'JNK', 'p38']
 
 assert sachs.node_names == NODE_NAMES
 
-idx_dict = dict((name,i) for i,name in enumerate(NODE_NAMES))
-
-TARGETS = [None, "MEK", "PIP2", "PIP3", "AKT", "PKC"]
-TARGETS_IDX =  [None if name is None else idx_dict[name] for name in TARGETS]
+_expected_observations = [853, 902, 911, 723, 810, 799, 848, 913, 707]
 
 # --------------------------------------------------------------------
 # Auxiliary functions
-
-_expected_observations = [1755, 799, 810, 848, 911, 723]
 
 
 def _process_data():
     """Process the data from the .csv files into a single np.array where
     the columns are in the same order as the DAGs."""
-    dataframes = [pd.read_csv(DATA_PATH + f) for f in filenames]
-    data = [df[var_names].to_numpy() for df in dataframes]
-    # Test that data was correctly build
+    dataframes = [pd.read_csv(_DATA_PATH + f) for f in _filenames]
+    for df in dataframes:
+        print(df.columns)
+    data = [df[_var_names].to_numpy() for df in dataframes]
     assert _expected_observations == [len(sample) for sample in data]
     # Save data
-    filename = DATA_PATH + "sachs_data_wang_2017"
+    filename = _DATA_PATH + "sachs_data_sachs_2005"
     np.savez(filename, *data)
-    print("Targets")
-    for i, n in enumerate([len(X) for X in data]):
-        print("  %s : %d observations" % (TARGETS[i], n))
     print("Saved dataset to %s.npz" % filename)
 
 
 def load_data(normalize=False):
-    return sachs.load_data(DATA_PATH + 'sachs_data_wang_2017.npz', normalize)
+    return sachs.load_data(_DATA_PATH + 'sachs_data_sachs_2005.npz', normalize)
 
 
 def prepare_experiments_directory(path, graph_name, normalize=False):
     path += "" if path[-1] == "/" else "/"
-    directory_name = "dataset_%d_sachs_wang_2017_normalized:%s" % (time.time(), normalize)
+    directory_name = "dataset_%d_sachs_sachs_2005_normalized:%s" % (time.time(), normalize)
     graph = sachs.DAGs[graph_name]
     data = load_data(normalize)
     sachs.prepare_experiments_directory(path + directory_name, data, graph)
