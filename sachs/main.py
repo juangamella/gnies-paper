@@ -32,7 +32,6 @@
 """
 
 import numpy as np
-import pandas as pd
 import gnies.utils
 import src.utils as utils
 import argparse
@@ -167,25 +166,27 @@ def load_data(path, normalize=True):
         data = [(X - mean) / std for X in data]
     return data
 
-        
-# def prepare_dataset_directory(path, dag_name, normalize=False):
-#     path += "" if path[-1] == "/" else "/"
-#     os.makedirs(path)
-#     data = load_data(normalize)
-#     n = 800  # Just used for the filenames
-#     # Write data
-#     filename = path + utils.test_case_filename(n, 0, 0)
-#     utils.data_to_bin(data, path + utils.test_case_filename(n, 0, 0), debug=True)
-#     # Write test case info
-#     graph = dict(DAGs)[dag_name]
-#     args = argparse.Namespace()
-#     args.p = len(graph)
-#     to_save = {"n_cases": 1, "cases": [graph], "runs": 1, "Ns": [n], "args": args,
-#                "graph": graph}
-#     filename = path + utils.INFO_FILENAME
-#     utils.write_pickle(filename, to_save)
-#     print('  saved test case info to "%s"' % filename)
-#     # Write test_case_graph
-#     filename = path + "consensus_graph"
-#     utils.data_to_bin(graph, filename, debug=False)
-#     print('  saved test graph to "%s"' % filename)
+
+def prepare_experiments_directory(directory, data, graph):
+    directory += "" if directory[-1] == "/" else "/"
+    os.makedirs(directory)
+    # Prepare and save test case info
+    n = -1  # Just used for the filenames
+    args = argparse.Namespace()
+    args.p = len(graph)
+    to_save = {"n_cases": 1,
+               "cases": [graph],
+               "runs": 1,
+               "Ns": [n],
+               "args": args,
+               "graph": graph}
+    filename = directory + utils.INFO_FILENAME
+    utils.write_pickle(filename, to_save)
+    print('  saved test case info to "%s"' % filename)
+    # Write data
+    filename = directory + utils.test_case_filename(n, 0, 0)
+    utils.data_to_bin(data, filename, debug=True)
+    # Write test_case_graph
+    filename = directory + 'graph'
+    utils.data_to_bin(graph, filename, debug=True)
+    print('  saved graph to "%s"' % filename)

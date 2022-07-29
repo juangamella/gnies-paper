@@ -34,6 +34,7 @@
 import numpy as np
 import pandas as pd
 import sachs
+import time
 
 DATA_PATH = "sachs/wang_2017/"
 
@@ -79,3 +80,11 @@ def _process_data():
 
 def load_data(normalize=True):
     return sachs.load_data(DATA_PATH + 'sachs_data_wang_2017.npz')
+
+
+def prepare_experiments_directory(path, graph_name, normalize=False):
+    path += "" if path[-1] == "/" else "/"
+    directory_name = "dataset_%d_sachs_wang_2017_normalized:%s" % (time.time(), normalize)
+    graph = sachs.DAGs[graph_name]
+    data = load_data(normalize)
+    sachs.prepare_experiments_directory(path + directory_name, data, graph)

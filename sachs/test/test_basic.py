@@ -39,20 +39,39 @@ import unittest
 
 
 class BasicTests(unittest.TestCase):
-
-    def test_wang_2017(self):
+    """Test that importing and loading the data works"""
+    
+    def test_wang_2017_load(self):
         import sachs.wang_2017 as sachs_wang
         import sachs.wang_2017.main
         data = sachs_wang.load_data(normalize=True)
         nobs = [len(s) for s in data]
         self.assertEqual(nobs, sachs.wang_2017.main._expected_observations)
+        self.assertEqual(data[0].shape[1], 11)
         data = sachs_wang.load_data(normalize=False)
         nobs = [len(s) for s in data]
         self.assertEqual(nobs, sachs.wang_2017.main._expected_observations)
+        self.assertEqual(data[0].shape[1], 11)
+
+    def test_wang_2017_directory(self):
+        import sachs.wang_2017 as sachs_wang
+        path = '/tmp'
+        graph = 'consensus'
+        sachs_wang.prepare_experiments_directory(path, graph, normalize=False)
+        sachs_wang.prepare_experiments_directory(path, graph, normalize=True)
 
     def test_taeb_2022(self):
         import sachs.taeb_2022 as sachs_taeb
         data = sachs_taeb.load_data(normalize=True)
+        self.assertEqual(data[0].shape[1], 11)
         self.assertEqual(len(data), 8)
         data = sachs_taeb.load_data(normalize=False)
+        self.assertEqual(data[0].shape[1], 11)
         self.assertEqual(len(data), 8)
+
+    def test_taeb_2022_directory(self):
+        import sachs.taeb_2022 as sachs_taeb
+        path = '/tmp'
+        graph = 'consensus'
+        sachs_taeb.prepare_experiments_directory(path, graph, normalize=False)
+        sachs_taeb.prepare_experiments_directory(path, graph, normalize=True)
