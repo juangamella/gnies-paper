@@ -48,14 +48,22 @@ import traceback
 
 METHOD_NAME = 'gies'
 
-# --------------------------------------------------------------------
-# Auxiliary functions
 if __name__ != '__main__':
     msg = "Not running as a script, i.e. python -m package.module"
     raise Exception(msg)
 
 # --------------------------------------------------------------------
 # Auxiliary functions
+
+
+def parse_targets(string):
+    targets = []
+    for env_targets in string.split('|'):
+        if env_targets == '':
+            targets.append([])
+        else:
+            targets.append([int(i) for i in env_targets.split(',')])
+    return targets
 
 # --------------------------------------------------------------------
 # Parse input parameters
@@ -77,6 +85,7 @@ arguments = {
     'n_lambdas': {'default': 1, 'type': int},
     'lambdas': {'type': str},
     'gies_verbose': {'default': False, 'type': bool},
+    'targets': {'type': str}
 }
 
 # Parse settings from input
@@ -122,17 +131,23 @@ info = utils.read_pickle(args.directory + utils.INFO_FILENAME)
 n_cases, runs, Ns, p = info['n_cases'], info['runs'], info['Ns'], info['args'].p
 
 # Extract ground truth intervention targets
-all_targets = []
-# Note: interventions are [{intervention_type: {target: (mean, variance)}*}]ñ
-for (_, interventions) in info['cases']:
-    case_targets = []
-    for intervention in interventions:
-        parameters = list(intervention.values())[0]
-        if parameters is None:
-            case_targets.append([])
-        else:
-            case_targets.append(list(parameters.keys()))
-    all_targets.append(case_targets)
+if args.targets is not None:
+    targets = parse_targets(args.targets)
+    print("\nParsed targets :", targets)
+    print()
+    all_targets = [targets] * n_cases
+else:
+    all_targets = []
+    # Note: interventions are [{intervention_type: {target: (mean, variance)}*}]ñ
+    for (_, interventions) in info['cases']:
+        case_targets = []
+        for intervention in interventions:
+            parameters = list(intervention.values())[0]
+            if parameters is None:
+                case_targets.append([])
+            else:
+                case_targets.append(list(parameters.keys()))
+        all_targets.append(case_targets)
 
 n_samples = n_cases * runs * len(Ns)
 print("Dataset contains a total of %d samples from %d cases at sample sizes %s for %d runs" %
