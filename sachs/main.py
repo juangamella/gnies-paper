@@ -38,28 +38,12 @@ import src.utils as utils
 import argparse
 import os
 
-DATA_PATH = "datasets/sachs/"
-PATH = "sachs_experiments/"
-
 # --------------------------------------------------------------------
 # Variable names
 
-filenames = [
-    "b2camp.csv",
-    "cd3cd28+aktinhib.csv",
-    "cd3cd28+g0076.csv",
-    "cd3cd28+ly.csv",
-    "cd3cd28+psitect.csv",
-    "cd3cd28+u0126.csv",
-    "cd3cd28.csv",
-    "pma.csv",
-]
+DAGS_PATH = 'sachs/dags/'
 
 node_names = ["RAF", "MEK", "ERK", "PLcg", "PIP2", "PIP3", "PKC", "AKT", "PKA", "JNK", "P38"]
-var_names = ["praf", "pmek", "p44/42", "plcg", "PIP2",
-             "PIP3", "PKC", "pakts473", "PKA", "pjnk", "P38"]
-
-nodes_vars = dict(zip(node_names, var_names))
 
 # --------------------------------------------------------------------
 # DAG estimates from the literature
@@ -152,27 +136,30 @@ DAGs += [("consensus", dag_consensus), ("eaton", dag_eaton),
 for i, dag in enumerate(gnies.utils.all_dags(cpdag_icp)):
     DAGs.append(("dantzig-%d" % (i + 1), dag))
 
+DAGs = dict(DAGs)
 
 # --------------------------------------------------------------------
 # Auxiliary functions
 
 
 def store_DAGs():
-    for (name, A) in DAGs:
-        utils.data_to_bin(A, DATA_PATH + name, debug=True)
+    for (name, A) in DAGs.items():
+        utils.data_to_bin(A, DAGS_PATH + name, debug=True)
 
 
-def process_data():
-    """Process the data from the .csv files into a single np.array where
-    the columns are in the same order as the DAGs."""
-    dataframes = [pd.read_csv(DATA_PATH + f) for f in filenames]
-    data = [df[var_names].to_numpy() for df in dataframes]
-    np.savez(DATA_PATH + "sachs_data", *data)
-
-
-def load_data(normalize=True):
-    f = np.load(DATA_PATH + "sachs_data.npz")
+def load_data(path, normalize=True):
+    f = np.load(path)
     data = list(f.values())
+    if normalize:
+        print('Loading and NORMALIZING data from "%s"' % path)
+    else:
+        print('Loading data from "%s"' % path)
+    print('Samples:')
+    total = 0
+    for i, sample in enumerate(data):
+        print("   %d : %d observations" % (i, len(sample)))
+        total += len(sample)
+    print(" TOTAL: %d observations" % total)
     if normalize:
         pooled = np.vstack(data)
         mean = pooled.mean(axis=0)
@@ -180,25 +167,25 @@ def load_data(normalize=True):
         data = [(X - mean) / std for X in data]
     return data
 
-
-def prepare_dataset_directory(path, dag_name, normalize=False):
-    path += "" if path[-1] == "/" else "/"
-    os.makedirs(path)
-    data = load_data(normalize)
-    n = 800  # Just used for the filenames
-    # Write data
-    filename = path + utils.test_case_filename(n, 0, 0)
-    utils.data_to_bin(data, path + utils.test_case_filename(n, 0, 0), debug=True)
-    # Write test case info
-    graph = dict(DAGs)[dag_name]
-    args = argparse.Namespace()
-    args.p = len(graph)
-    to_save = {"n_cases": 1, "cases": [graph], "runs": 1, "Ns": [n], "args": args,
-               "graph": graph}
-    filename = path + utils.INFO_FILENAME
-    utils.write_pickle(filename, to_save)
-    print('  saved test case info to "%s"' % filename)
-    # Write test_case_graph
-    filename = path + "consensus_graph"
-    utils.data_to_bin(graph, filename, debug=False)
-    print('  saved test graph to "%s"' % filename)
+        
+# def prepare_dataset_directory(path, dag_name, normalize=False):
+#     path += "" if path[-1] == "/" else "/"
+#     os.makedirs(path)
+#     data = load_data(normalize)
+#     n = 800  # Just used for the filenames
+#     # Write data
+#     filename = path + utils.test_case_filename(n, 0, 0)
+#     utils.data_to_bin(data, path + utils.test_case_filename(n, 0, 0), debug=True)
+#     # Write test case info
+#     graph = dict(DAGs)[dag_name]
+#     args = argparse.Namespace()
+#     args.p = len(graph)
+#     to_save = {"n_cases": 1, "cases": [graph], "runs": 1, "Ns": [n], "args": args,
+#                "graph": graph}
+#     filename = path + utils.INFO_FILENAME
+#     utils.write_pickle(filename, to_save)
+#     print('  saved test case info to "%s"' % filename)
+#     # Write test_case_graph
+#     filename = path + "consensus_graph"
+#     utils.data_to_bin(graph, filename, debug=False)
+#     print('  saved test graph to "%s"' % filename)

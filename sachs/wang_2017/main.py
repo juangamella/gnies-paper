@@ -33,44 +33,49 @@
 
 import numpy as np
 import pandas as pd
+import sachs
 
-dag_consensus = np.array(
-    [
-        [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
-        [0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0],
-        [1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    ]
-)
+DATA_PATH = "sachs/wang_2017/"
 
-filenames = ['iv=.txt', 'iv=1.txt', 'iv=3.txt', 'iv=4.txt', 'iv=6.txt', 'iv=8.txt']
+filenames = [
+    'iv=.txt',
+    'iv=1.txt',
+    'iv=3.txt',
+    'iv=4.txt',
+    'iv=6.txt',
+    'iv=8.txt']
 
-node_names = ["RAF", "MEK", "ERK", "PLcg", "PIP2", "PIP3", "PKC", "AKT", "PKA", "JNK", "P38"]
+NODE_NAMES = ["RAF", "MEK", "ERK", "PLcg", "PIP2", "PIP3", "PKC", "AKT", "PKA", "JNK", "P38"]
 var_names = ['Raf', 'Mek', 'Erk', 'PLCg', 'PIP2', 'PIP3', 'PKC', 'Akt', 'PKA', 'JNK', 'p38']
 
-idx_dict = dict((name,i) for i,name in enumerate(node_names))
-target_names = [None, "MEK", "PIP2", "PIP3", "AKT", "PKC"]
-expected_observations = [1755, 799, 810, 848, 911, 723]
-target_indices = [None if name is None else idx_dict[name] for name in target_names]
+assert sachs.node_names == NODE_NAMES
 
-print("Target indices: %s" % target_indices)
+idx_dict = dict((name,i) for i,name in enumerate(NODE_NAMES))
 
-dataframes = [pd.read_csv(f) for f in filenames]
-for df in dataframes:
-    print(df.columns)
-data = [df[var_names].to_numpy() for df in dataframes]
-np.savez("sachs_data_wang_2017", *data)
+TARGETS = [None, "MEK", "PIP2", "PIP3", "AKT", "PKC"]
+TARGETS_IDX =  [None if name is None else idx_dict[name] for name in TARGETS]
 
-print("Observations:", [len(X) for X in data])
-print("Should match:", expected_observations)
-print(" ", [len(X) for X in data] == expected_observations)
-print("Observations:", [(target, len(X)) for target,X in zip(target_names, data)])
+# --------------------------------------------------------------------
+# Auxiliary functions
 
-print('Compiled data into "sachs_data_wang_2017"')
+_expected_observations = [1755, 799, 810, 848, 911, 723]
+
+
+def _process_data():
+    """Process the data from the .csv files into a single np.array where
+    the columns are in the same order as the DAGs."""
+    dataframes = [pd.read_csv(DATA_PATH + f) for f in filenames]
+    data = [df[var_names].to_numpy() for df in dataframes]
+    # Test that data was correctly build
+    assert [len(X) for X in data] == _expected_observations
+    # Save data
+    filename = DATA_PATH + "sachs_data_wang_2017"
+    np.savez(filename, *data)
+    print("Targets")
+    for i, n in enumerate([len(X) for X in data]):
+        print("  %s : %d observations" % (TARGETS[i], n))
+    print("Saved dataset to %s.npz" % filename)
+
+
+def load_data(normalize=True):
+    return sachs.load_data(DATA_PATH + 'sachs_data_wang_2017.npz')

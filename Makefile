@@ -41,6 +41,9 @@ else
 	python -m unittest $(PROJECT).test.$(SUITE)
 endif
 
+sachs_tests:
+	python -m unittest discover sachs.test
+
 # Run the example scripts in the README
 examples:
 	PYTHONPATH=./ python3 docs/template_example.py
