@@ -146,7 +146,7 @@ def store_DAGs():
         utils.data_to_bin(A, DAGS_PATH + name, debug=True)
 
 
-def load_data(path, normalize=True):
+def load_data(path, normalize):
     f = np.load(path)
     data = list(f.values())
     if normalize:

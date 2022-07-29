@@ -72,8 +72,8 @@ def _process_data():
     print("Saved dataset to %s.npz" % filename)
 
 
-def load_data(normalize=True):
-    return sachs.load_data(DATA_PATH + 'sachs_data_taeb_2022.npz')
+def load_data(normalize=False):
+    return sachs.load_data(DATA_PATH + 'sachs_data_taeb_2022.npz', normalize)
 
 
 def prepare_experiments_directory(path, graph_name, normalize=False):
