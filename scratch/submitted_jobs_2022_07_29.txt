@@ -1,0 +1,99 @@
+######################################################################
+# Generate test directories for raw dataset data
+
+# import sachs.wang_2017
+# sachs.wang_2017.prepare_experiments_directory('sachs_experiments/', 'consensus', normalize=True)
+# sachs.wang_2017.prepare_experiments_directory('sachs_experiments/', 'consensus', normalize=False)
+
+# import sachs.sachs_2005
+# sachs.sachs_2005.prepare_experiments_directory('sachs_experiments/', 'consensus', normalize=True)
+# sachs.sachs_2005.prepare_experiments_directory('sachs_experiments/', 'consensus', normalize=False)
+
+######################################################################
+# Generate hybrid DRF data
+
+# bsub -n 10 -W 1:00 python3 -m src.gen_hybrid_data --tag sachs_wang --type drf --runs 10 --directory sachs_experiments/ --dataset "sachs_experiments/dataset_1659123588_sachs_wang_2017_normalized:False/test_case_n:-1_g:0_r:0.npz" --graph "sachs_experiments/dataset_1659123588_sachs_wang_2017_normalized:False/graph.npy" --cluster
+
+# bsub -n 10 -W 1:00 python3 -m src.gen_hybrid_data --tag sachs_wang_normalized --type drf --runs 10 --directory sachs_experiments/ --dataset "sachs_experiments/dataset_1659123588_sachs_wang_2017_normalized:True/test_case_n:-1_g:0_r:0.npz" --graph "sachs_experiments/dataset_1659123588_sachs_wang_2017_normalized:True/graph.npy" --cluster
+
+
+# bsub -n 10 -W 1:00 python3 -m src.gen_hybrid_data --tag sachs_2005 --type drf --runs 10 --directory sachs_experiments/ --dataset "sachs_experiments/dataset_1659123603_sachs_sachs_2005_normalized:False/test_case_n:-1_g:0_r:0.npz" --graph "sachs_experiments/dataset_1659123603_sachs_sachs_2005_normalized:False/graph.npy" --cluster
+
+# bsub -n 10 -W 1:00 python3 -m src.gen_hybrid_data --tag sachs_2005_normalized --type drf --runs 10 --directory sachs_experiments/ --dataset "sachs_experiments/dataset_1659123603_sachs_sachs_2005_normalized:True/test_case_n:-1_g:0_r:0.npz" --graph "sachs_experiments/dataset_1659123603_sachs_sachs_2005_normalized:True/graph.npy" --cluster
+
+######################################################################
+# Launch methods on the raw data
+
+DIR_WANG="/cluster/scratch/gajuan/sachs_experiments/dataset_1659123588_sachs_wang_2017_normalized:False"
+DIR_WANG_NORM="/cluster/scratch/gajuan/sachs_experiments/dataset_1659123588_sachs_wang_2017_normalized:True"
+DIR_SACHS="/cluster/scratch/gajuan/sachs_experiments/dataset_1659123603_sachs_sachs_2005_normalized:False"
+DIR_SACHS_NORM="/cluster/scratch/gajuan/sachs_experiments/dataset_1659123603_sachs_sachs_2005_normalized:True"
+
+# GES
+bsub -n 1 -W 1:00 python3 -m src.run_ges --lambdas 0.01,0.25,0.5,0.75,1 --n_workers 1 --directory $DIR_WANG
+bsub -n 1 -W 1:00 python3 -m src.run_ges --lambdas 0.01,0.25,0.5,0.75,1 --n_workers 1 --directory $DIR_WANG_NORM
+bsub -n 1 -W 1:00 python3 -m src.run_ges --lambdas 0.01,0.25,0.5,0.75,1 --n_workers 1 --directory $DIR_SACHS
+bsub -n 1 -W 1:00 python3 -m src.run_ges --lambdas 0.01,0.25,0.5,0.75,1 --n_workers 1 --directory $DIR_SACHS_NORM
+
+# GIES
+bsub -n 1 -W 1:00 "python3 -m src.run_gies --lambdas 0.01,0.25,0.5,0.75,1 --n_workers 1 --directory $DIR_WANG --targets '|1|4|5|7|6'"
+bsub -n 1 -W 1:00 "python3 -m src.run_gies --lambdas 0.01,0.25,0.5,0.75,1 --n_workers 1 --directory $DIR_WANG_NORM --targets '|1|4|5|7|6'"
+
+
+# UT-IGSP
+bsub -n 1 -W 1:00 python3 -m src.run_utigsp --n_workers 1 --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-20" --directory $DIR_WANG
+bsub -n 1 -W 1:00 python3 -m src.run_utigsp --n_workers 1 --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-20" --directory $DIR_WANG_NORM
+bsub -n 1 -W 1:00 python3 -m src.run_utigsp --n_workers 1 --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-20" --directory $DIR_SACHS
+bsub -n 1 -W 1:00 python3 -m src.run_utigsp --n_workers 1 --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-20" --directory $DIR_SACHS_NORM
+
+# UT-IGSP + HSIC
+
+bsub -n 32 -W 4:00 python3 -m src.run_utigsp --n_workers 8 --test hsic --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-20" --directory $DIR_WANG
+bsub -n 32 -W 4:00 python3 -m src.run_utigsp --n_workers 8 --test hsic --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-20" --directory $DIR_WANG_NORM
+bsub -n 32 -W 4:00 python3 -m src.run_utigsp --n_workers 8 --test hsic --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-20" --directory $DIR_SACHS
+bsub -n 32 -W 4:00 python3 -m src.run_utigsp --n_workers 8 --test hsic --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-20" --directory $DIR_SACHS_NORM
+
+# GNIES
+bsub -n 6 -W 12:00 python3 -m src.run_gnies --n_workers 5 --lambdas 0.01,0.25,0.5,0.75,1 --directory $DIR_WANG
+bsub -n 6 -W 12:00 python3 -m src.run_gnies --n_workers 5 --lambdas 0.01,0.25,0.5,0.75,1 --directory $DIR_WANG_NORM
+bsub -n 6 -W 12:00 python3 -m src.run_gnies --n_workers 5 --lambdas 0.01,0.25,0.5,0.75,1 --directory $DIR_SACHS
+bsub -n 6 -W 12:00 python3 -m src.run_gnies --n_workers 5 --lambdas 0.01,0.25,0.5,0.75,1 --directory $DIR_SACHS_NORM
+
+######################################################################
+# Launch methods on the DRF data
+
+DIR_WANG_NORM_DRF="/cluster/scratch/gajuan/sachs_experiments/dataset_1659123932_runs:10_seed:42_tag:sachs_wang_normalized_type:drf_standardize:0_n:None/"
+DIR_WANG_DRF="/cluster/scratch/gajuan/sachs_experiments/dataset_1659124323_runs:10_seed:42_tag:sachs_wang_type:drf_standardize:0_n:None/"
+DIR_SACHS_DRF="/cluster/scratch/gajuan/sachs_experiments/dataset_1659124323_runs:10_seed:42_tag:sachs_2005_type:drf_standardize:0_n:None/"
+DIR_SACHS_NORM_DRF="/cluster/scratch/gajuan/sachs_experiments/dataset_1659124353_runs:10_seed:42_tag:sachs_2005_normalized_type:drf_standardize:0_n:None/"
+
+# GES
+bsub -n 1 -W 1:00 python3 -m src.run_ges --lambdas 0.01,0.25,0.5,0.75,1 --n_workers 1 --directory $DIR_WANG_DRF
+bsub -n 1 -W 1:00 python3 -m src.run_ges --lambdas 0.01,0.25,0.5,0.75,1 --n_workers 1 --directory $DIR_WANG_NORM_DRF
+bsub -n 1 -W 1:00 python3 -m src.run_ges --lambdas 0.01,0.25,0.5,0.75,1 --n_workers 1 --directory $DIR_SACHS_DRF
+bsub -n 1 -W 1:00 python3 -m src.run_ges --lambdas 0.01,0.25,0.5,0.75,1 --n_workers 1 --directory $DIR_SACHS_NORM_DRF
+
+# GIES
+bsub -n 1 -W 1:00 "python3 -m src.run_gies --lambdas 0.01,0.25,0.5,0.75,1 --n_workers 1 --directory $DIR_WANG_DRF --targets '|1|4|5|7|6'"
+bsub -n 1 -W 1:00 "python3 -m src.run_gies --lambdas 0.01,0.25,0.5,0.75,1 --n_workers 1 --directory $DIR_WANG_NORM_DRF --targets '|1|4|5|7|6'"
+
+
+# UT-IGSP
+bsub -n 1 -W 1:00 python3 -m src.run_utigsp --n_workers 1 --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-20" --directory $DIR_WANG_DRF
+bsub -n 1 -W 1:00 python3 -m src.run_utigsp --n_workers 1 --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-20" --directory $DIR_WANG_NORM_DRF
+bsub -n 1 -W 1:00 python3 -m src.run_utigsp --n_workers 1 --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-20" --directory $DIR_SACHS_DRF
+bsub -n 1 -W 1:00 python3 -m src.run_utigsp --n_workers 1 --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-20" --directory $DIR_SACHS_NORM_DRF
+
+
+# UT-IGSP + HSIC
+
+bsub -n 50 -W 4:00 python3 -m src.run_utigsp --n_workers 49 --test hsic --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-20" --directory $DIR_WANG_DRF
+bsub -n 50 -W 4:00 python3 -m src.run_utigsp --n_workers 49 --test hsic --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-20" --directory $DIR_WANG_NORM_DRF
+bsub -n 50 -W 4:00 python3 -m src.run_utigsp --n_workers 49 --test hsic --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-20" --directory $DIR_SACHS_DRF
+bsub -n 50 -W 4:00 python3 -m src.run_utigsp --n_workers 49 --test hsic --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-20" --directory $DIR_SACHS_NORM_DRF
+
+# GNIES
+bsub -n 50 -W 12:00 python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1 --directory $DIR_WANG_DRF
+bsub -n 50 -W 12:00 python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1 --directory $DIR_WANG_NORM_DRF
+bsub -n 50 -W 12:00 python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1 --directory $DIR_SACHS_DRF
+bsub -n 50 -W 12:00 python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1 --directory $DIR_SACHS_NORM_DRF

@@ -14,7 +14,7 @@ GAUSS_DIR="/cluster/scratch/gajuan/sachs_experiments/dataset_1658417439_runs:10_
 # Run methods on real dataset
 
 
-# bsub -n 6 -W 1:00 python3 -m src.run_gnies --n_workers 5 --phases b --lambdas 0.01,0.25,0.5,0.75,1 --directory $REAL_DIR
+# bsub -n 25 -W 1:00 python3 -m src.run_gnies --n_workers 5 --phases b --lambdas 0.01,0.25,0.5,0.75,1 --directory $REAL_DIR
 
 # bsub -n 1 -W 1:00 python3 -m src.run_utigsp --n_workers 1 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory $REAL_DIR
 
