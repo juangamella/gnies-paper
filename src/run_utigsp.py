@@ -174,7 +174,7 @@ def case_info_to_indices(info):
 # ------------------
 # Code to run method
 
-print("Running UT-IGSP with Gaussian CI/Invariance tests")
+print("Running UT-IGSP with" + "Gaussian CI/Invariance tests" if args.test == 'gauss' else "HSIC CI/Invariance tests")
 print("  on alphas :", alphas)
 print("  on betas :", betas)
 
