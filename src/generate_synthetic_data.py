@@ -39,7 +39,7 @@ import src.utils as utils
 import gc  # Garbage collector
 import time
 import os
-import pickle
+import varsortability
 
 # --------------------------------------------------------------------
 # Parse input parameters
@@ -141,22 +141,14 @@ for i in range(args.G):
         interventions.append(intervention)
     test_cases.append((scm, interventions))
 
-# Save test cases for analysis
-Ns = sorted([int(n) for n in args.n.split(",")])
-to_save = {"n_cases": len(test_cases), "runs": args.runs, "Ns": Ns, "args": args, "cases": test_cases}
-filename = directory + utils.INFO_FILENAME
-utils.write_pickle(filename, to_save)
-print('\nSaved test cases + info to "%s"' % filename)
-
 
 # Sample data for each run
 
+Ns = sorted([int(n) for n in args.n.split(",")])
 
-# obs_Ns = None if args.n_obs is None else [int(n) for n in args.n_obs.split('i')]
-# assert (obs_Ns is None or len(Ns) == len(obs_Ns))
+varsortability_scores = np.zeros((len(test_cases), args.envs, len(Ns), args.runs))
 
-
-for n in Ns:
+for k, n in enumerate(Ns):
     print()
     print("---------------------------------")
     print("Generating datasets for n=%d" % n)
@@ -168,17 +160,32 @@ for n in Ns:
             print(" " * 5, (row != 0).astype(int))
         print("    generating data for run:")
         print(" " * 5, end="")
-        for j in range(args.runs):
-            print(j, end=" ")
+        for r in range(args.runs):
+            print(r, end=" ")
             # Generate the data for each environment
             data = []
-            for intervention in interventions:
-                data += [scm.sample(n, **intervention, random_state=j)]
+            for j, intervention in enumerate(interventions):
+                sample = scm.sample(n, **intervention, random_state=r)
+                data += [sample]
+                varsortability_scores[i,j,k,r] = varsortability.score(sample, scm.W)
             # Save the data to file
-            path = directory + utils.test_case_filename(n, i, j)
+            path = directory + utils.test_case_filename(n, i, r)
             utils.data_to_bin(data, path, debug=args.debug)
             del data
             gc.collect()
         print()
 
 print('Stored dataset in "%s"' % directory)
+
+print('Varsortability, envs x sample_size:')
+print(varsortability_scores.mean(axis=(0, 3)))
+
+# Save test cases for analysis
+to_save = {"n_cases": len(test_cases),
+           "runs": args.runs,
+           "Ns": Ns, "args": args,
+           "cases": test_cases,
+           'varsortability': varsortability_scores}
+filename = directory + utils.INFO_FILENAME
+utils.write_pickle(filename, to_save)
+print('\nSaved test cases + info to "%s"' % filename)
