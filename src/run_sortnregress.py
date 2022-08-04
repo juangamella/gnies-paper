@@ -234,7 +234,6 @@ def process_results():
                'times': times}
     method_name = METHOD_NAME + ("_" + args.tag if args.tag is not None else "")
     path = args.directory + utils.compiled_results_filename(method_name)
-    path += "_" + args.tag if args.tag is not None else ""
     utils.write_pickle(path, ((args, Ns), results))
 
     print('Wrote compiled results to "%s"' % path)
