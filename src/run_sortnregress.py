@@ -224,15 +224,16 @@ def process_results():
     results = {'estimates': estimates,
                'I_estimates': I_estimates,
                'times': times}
-    path = args.directory + utils.compiled_results_filename(METHOD_NAME_PLUS)
-    path += "_" + args.tag if args.tag is not None else ""
+    method_name = METHOD_NAME_PLUS + ("_" + args.tag if args.tag is not None else "")
+    path = args.directory + utils.compiled_results_filename(method_name)
     utils.write_pickle(path, ((args, Ns), results))
 
     # For sortnregress (i.e. only the DAG estimate)
     results = {'estimates': dag_estimates,
                'I_estimates': I_estimates,
                'times': times}
-    path = args.directory + utils.compiled_results_filename(METHOD_NAME)
+    method_name = METHOD_NAME + ("_" + args.tag if args.tag is not None else "")
+    path = args.directory + utils.compiled_results_filename(method_name)
     path += "_" + args.tag if args.tag is not None else ""
     utils.write_pickle(path, ((args, Ns), results))
 
