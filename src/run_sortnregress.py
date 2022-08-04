@@ -71,6 +71,7 @@ arguments = {
     'debug': {'default': False, 'type': bool},
     'chunksize': {'type': int, 'default': 1},
     'compile_only': {'type': bool, 'default': False},
+    'tag': {'type': str},
     # Method parameters
     'env': {'default': 0, 'type': int},
     'pool': {'default': False, 'type': bool},
@@ -224,6 +225,7 @@ def process_results():
                'I_estimates': I_estimates,
                'times': times}
     path = args.directory + utils.compiled_results_filename(METHOD_NAME_PLUS)
+    path += "_" + args.tag if args.tag is not None else ""
     utils.write_pickle(path, ((args, Ns), results))
 
     # For sortnregress (i.e. only the DAG estimate)
@@ -231,6 +233,7 @@ def process_results():
                'I_estimates': I_estimates,
                'times': times}
     path = args.directory + utils.compiled_results_filename(METHOD_NAME)
+    path += "_" + args.tag if args.tag is not None else ""
     utils.write_pickle(path, ((args, Ns), results))
 
     print('Wrote compiled results to "%s"' % path)
