@@ -36,6 +36,7 @@ import sempler
 import sempler.generators as gen
 import numpy as np
 import src.utils as utils
+import gnies.utils
 import gc  # Garbage collector
 import time
 import os
@@ -73,6 +74,7 @@ arguments = {
     # Sampling parameters
     "n": {"default": "1000", "type": str},
     "obs": {"default": False, "type": bool},
+    "varsort": {"default": False, "type": bool}
 }
 
 # Parse settings from input
@@ -128,7 +130,19 @@ test_cases = []
 for i in range(args.G):
     # Generate SCM
     W = gen.dag_avg_deg(args.p, args.k, args.w_min, args.w_max, random_state=args.seed + i)
-    scm = sempler.LGANM(W, (args.m_min, args.m_max), (args.v_min, args.v_max))
+    # Sample noise-term variances
+    if args.varsort:
+        order = gnies.utils.topological_ordering(W)
+        rng = np.random.default_rng(i)
+        sorted_variances = np.sort(rng.uniform(args.v_min, args.v_max, size=args.p))[::-1]
+        variances = np.zeros(args.p, dtype=float)
+        for i, node in enumerate(order):
+            variances[node] = sorted_variances[i]
+        print(order)
+        print(variances)
+    else:
+        variances = (args.v_min, args.v_max)
+    scm = sempler.LGANM(W, (args.m_min, args.m_max), variances)
     # Generate interventions and their parameters
     if args.obs:
         interventions = [{int_types[args.i_type]: None}]
