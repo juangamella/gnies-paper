@@ -108,16 +108,6 @@ def type_2_skeleton(estimate, truth):
     return _dist_struct(true_skeleton, estimated_skeleton)
 
 
-def varsortability(A, variances):
-    ordering = utils.topological_ordering(A)
-    paths = []
-    for i,fro in enumerate(ordering):
-        for to in ordering[(i+1):]:
-            # Can use semi-directed paths as A is anyway a DAG (or
-            # would have failed when calling topological_ordering
-            # above)
-            paths.append(utils.semi_directed_paths(fro,to,A))
-
 # --------------------------------------------------------------------
 # Auxiliary functions
 
