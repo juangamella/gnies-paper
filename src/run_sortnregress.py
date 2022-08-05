@@ -104,6 +104,9 @@ excluded_keys = [
 ]
 excluded_keys += ['env'] if args.pool else ['pool']
 
+if args.tag is not None:
+    METHOD_NAME += "_" + args.tag
+
 # --------------------------------------------------------------------
 # Run algorithm on samples
 
@@ -224,8 +227,7 @@ def process_results():
     results = {'estimates': estimates,
                'I_estimates': I_estimates,
                'times': times}
-    method_name = METHOD_NAME_PLUS + ("_" + args.tag if args.tag is not None else "")
-    path = args.directory + utils.compiled_results_filename(method_name)
+    path = args.directory + utils.compiled_results_filename(METHOD_NAME)
     utils.write_pickle(path, ((args, Ns), results))
 
     print('Wrote compiled results to "%s"' % path)
@@ -234,8 +236,7 @@ def process_results():
     results = {'estimates': dag_estimates,
                'I_estimates': I_estimates,
                'times': times}
-    method_name = METHOD_NAME + ("_" + args.tag if args.tag is not None else "")
-    path = args.directory + utils.compiled_results_filename(method_name)
+    path = args.directory + utils.compiled_results_filename(METHOD_NAME)
     utils.write_pickle(path, ((args, Ns), results))
 
     print('Wrote compiled results to "%s"' % path)
