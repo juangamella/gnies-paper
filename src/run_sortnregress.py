@@ -228,6 +228,8 @@ def process_results():
     path = args.directory + utils.compiled_results_filename(method_name)
     utils.write_pickle(path, ((args, Ns), results))
 
+    print('Wrote compiled results to "%s"' % path)
+    
     # For sortnregress (i.e. only the DAG estimate)
     results = {'estimates': dag_estimates,
                'I_estimates': I_estimates,
