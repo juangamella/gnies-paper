@@ -74,7 +74,8 @@ arguments = {
     # Sampling parameters
     "n": {"default": "1000", "type": str},
     "obs": {"default": False, "type": bool},
-    "varsort": {"default": False, "type": bool}
+    "varsort": {"default": False, "type": bool},
+    "standardize": {"default": False, "type": bool}
 }
 
 # Parse settings from input
@@ -96,7 +97,7 @@ excluded_keys += ["tag"] if args.tag is None else []
 excluded_keys += ["i_m_min", "i_m_max"] if args.i_m_min == 0 and args.i_m_max == 0 else []
 excluded_keys += ["m_min", "m_max"] if args.m_min == 0 and args.m_max == 0 else []
 excluded_keys += ["obs"] if args.obs is None else []
-
+excluded_keys += [] if args.varsort else ["varsort"]
 print(args)  # For debugging
 
 
@@ -179,9 +180,11 @@ for k, n in enumerate(Ns):
             # Generate the data for each environment
             data = []
             for j, intervention in enumerate(interventions):
-                sample = scm.sample(n, **intervention, random_state=r)
-                data += [sample]
-                varsortability_scores[i,j,k,r] = varsortability.score(sample, scm.W)
+                data += [scm.sample(n, **intervention, random_state=r)]
+            if args.standardize:
+                data = utils.standardize(data)
+            # Compute varsortability
+            varsortability_scores[i, :, k, r] = [varsortability.score(sample, scm.W) for sample in data]
             # Save the data to file
             path = directory + utils.test_case_filename(n, i, r)
             utils.data_to_bin(data, path, debug=args.debug)

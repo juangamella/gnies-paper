@@ -49,6 +49,13 @@ INFO_FILENAME = 'test_cases.pickle'
 # --------------------------------------------------------------------
 # Auxiliary functions
 
+def standardize(data):
+    pooled = np.vstack(data) if isinstance(data, list) else data
+    mean = pooled.mean(axis=0)
+    std = pooled.std(axis=0)
+    data = [(sample-mean) / std for sample in data]
+    return data
+
 def test_case_filename(n, graph, run):
     return 'test_case_n:%d_g:%d_r:%d' % (n, graph, run)
 
