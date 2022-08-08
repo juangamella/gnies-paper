@@ -1,5 +1,6 @@
  - Intervention size synthetics are in submitted_jobs_2022_07_25
- - Synthetics for |I|=3 are in submitted_jobs_2022_07_18
+ - Synthetics for |I|=3 are in submitted_jobs_2022_07_18, data was generated in 07_14
  - Sachs experiments on full sachs + wang are on submitted_jobs_2022_07_29.txt
  - Experiments to see the effect of additional intervention targets are in submitted_jobs_2022_07_25.txt
  - sortnregress for all synthetic data is in submitted_jobs_2022_08_04.txt
+ - Experiments with new standardized synthetic data are launched in 2022_08_05

@@ -1,0 +1,50 @@
+# Synthetic data generation
+
+python3 -m src.generate_synthetic_data --cluster --G 100 --runs 10 --n 10,100,1000 --i_size 0 --e 4 --p 10 --i_type noise --obs --standardize --tag I0s
+python3 -m src.generate_synthetic_data --cluster --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type noise --obs --standardize --tag I3s
+python3 -m src.generate_synthetic_data --cluster --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type do --obs --standardize --tag I3sd
+python3 -m src.generate_synthetic_data --cluster --G 100 --runs 10 --n 10,100,1000 --i_size 2 --e 4 --p 10 --i_type noise --obs --standardize --tag I6s
+python3 -m src.generate_synthetic_data --cluster --G 100 --runs 10 --n 10,100,1000 --i_size 3 --e 4 --p 10 --i_type noise --obs --standardize --tag I9s
+
+
+DIR_0="/cluster/scratch/gajuan/synthetic_experiments/dataset_1659697600_runs:10_seed:42_tag:I0s_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:noise_i_size:0_i_v_min:5_i_v_max:10_n:10,100,1000_obs:1_standardize:1/"
+DIR_3="/cluster/scratch/gajuan/synthetic_experiments/dataset_1659697682_runs:10_seed:42_tag:I3s_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:noise_i_size:1_i_v_min:5_i_v_max:10_n:10,100,1000_obs:1_standardize:1/"
+DIR_6="/cluster/scratch/gajuan/synthetic_experiments/dataset_1659697847_runs:10_seed:42_tag:I6s_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:noise_i_size:2_i_v_min:5_i_v_max:10_n:10,100,1000_obs:1_standardize:1/"
+DIR_9="/cluster/scratch/gajuan/synthetic_experiments/dataset_1659697932_runs:10_seed:42_tag:I9s_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:noise_i_size:3_i_v_min:5_i_v_max:10_n:10,100,1000_obs:1_standardize:1/"
+DIR_3DO="/cluster/scratch/gajuan/synthetic_experiments/dataset_1659697764_runs:10_seed:42_tag:I3sd_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:do_i_size:1_i_v_min:5_i_v_max:10_n:10,100,1000_obs:1_standardize:1/"
+
+
+# Run on |I| = 0
+bsub -n 50 -W 30:00 python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1 --directory $DIR_0
+bsub -n 50 -W 0:30 python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory $DIR_0
+bsub -n 50 -W 0:30 python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1 --directory $DIR_0
+bsub -n 50 -W 0:10 python3 -m src.run_sortnregress --n_workers 49 --directory $DIR_0
+bsub -n 50 -W 0:10 python3 -m src.run_sortnregress --n_workers 49 --pool --tag pool --directory $DIR_0
+
+# Run on |I| = 3
+bsub -n 50 -W 30:00 python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1 --directory $DIR_3
+bsub -n 50 -W 0:30 python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory $DIR_3
+bsub -n 50 -W 0:30 python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1 --directory $DIR_3
+bsub -n 50 -W 0:10 python3 -m src.run_sortnregress --n_workers 49 --directory $DIR_3
+bsub -n 50 -W 0:10 python3 -m src.run_sortnregress --n_workers 49 --pool --tag pool --directory $DIR_3
+
+# Run on |I| = 6
+bsub -n 50 -W 50:00 python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1 --directory $DIR_6
+bsub -n 50 -W 0:30 python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory $DIR_6
+bsub -n 50 -W 0:30 python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1 --directory $DIR_6
+bsub -n 50 -W 0:10 python3 -m src.run_sortnregress --n_workers 49 --directory $DIR_6
+bsub -n 50 -W 0:10 python3 -m src.run_sortnregress --n_workers 49 --pool --tag pool --directory $DIR_6
+
+# Run on |I| = 9
+bsub -n 50 -W 50:00 python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1 --directory $DIR_9
+bsub -n 50 -W 0:30 python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory $DIR_9
+bsub -n 50 -W 0:30 python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1 --directory $DIR_9
+bsub -n 50 -W 0:10 python3 -m src.run_sortnregress --n_workers 49 --directory $DIR_9
+bsub -n 50 -W 0:10 python3 -m src.run_sortnregress --n_workers 49 --pool --tag pool --directory $DIR_9
+
+# Run on |I| = 3
+bsub -n 50 -W 30:00 python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1 --directory $DIR_3DO
+bsub -n 50 -W 0:30 python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory $DIR_3DO
+bsub -n 50 -W 0:30 python3 -m src.run_gies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1 --directory $DIR_3DO
+bsub -n 50 -W 0:10 python3 -m src.run_sortnregress --n_workers 49 --directory $DIR_3DO
+bsub -n 50 -W 0:10 python3 -m src.run_sortnregress --n_workers 49 --pool --tag pool --directory $DIR_3DO
