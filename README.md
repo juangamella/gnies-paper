@@ -2,11 +2,20 @@
 
 This repository contains the code to reproduce the experiments and figures for the paper *"<TODO: paper title>"*, by JL. Gamella, A. Taeb, C. Heinze-Deml and P. Bühlmann. This README is not intended to be completely self-explanatory, and should be read alongside the manuscript (<TODO: link to arxiv>).
 
-## Software package
+## Software packages
+
+This repository contains only the code to reproduce the results from the paper.
 
 If you're interested in using the GnIES algorithm described in the paper for your own work, it is available as a separate and well-documented python package called `gnies`. You can find more information on its own repository at [github.com/juangamella/gnies](https://github.com/juangamella/gnies).
 
-This repository contains only the code to reproduce the results from the paper.
+We use other relevant packages:
+
+- `ges` for the [python implementation](https://github.com/juangamella/ges) of the GES algorithm
+- `gies` for the [python implementation](https://github.com/juangamella/gies) of the GIES algorithm
+- `causaldag` for UT-IGSP (see an [example](https://uhlerlab.github.io/causaldag/utigsp.html) and our [wrapper](https://github.com/juangamella/gnies-paper/blob/master/src/ut_igsp.py) including HSIC tests)
+- `sachs` to access the sachs dataset from a Python environment (see the [repository]())
+
+We additionally use the R and Python packages `drf` for the hybrid data generation using random forests.
 
 ## Installing Dependencies
 
