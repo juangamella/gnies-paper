@@ -28,7 +28,26 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# Unzip the synthetic datasets in synthetic_experiments/
+# Download and unzip the synthetic datasets in synthetic_experiments/
+
+URLS=(
+    "https://polybox.ethz.ch/index.php/s/AnZzOVZ7tv32V9o/download"
+    "https://polybox.ethz.ch/index.php/s/8xz0zL6YTnl52sM/download"
+    "https://polybox.ethz.ch/index.php/s/b4xpDUanh5S4Hdw/download"
+    "https://polybox.ethz.ch/index.php/s/gL09gDoxjzYqNuG/download"
+    )
+
+SAVEPATH="/tmp/synthetic_experiments/"
+
+
+# ---------------------------------
+# Check that commands are installed
+
+if ! command -v wget &> /dev/null
+then
+    echo 'ERROR: "wget" package needs to be installed to dowbload the datasets'
+    exit
+fi
 
 if ! command -v unzip &> /dev/null
 then
@@ -36,8 +55,37 @@ then
     exit
 fi
 
-for FILE in synthetic_experiments/dataset_*.zip
+
+# ---------------------------------
+# Download datasets
+
+echo "Downloading synthetic datasets"
+echo
+for URL in ${URLS[@]}
 do
-    unzip $FILE -d synthetic_experiments/
+    wget --content-disposition -P $SAVEPATH $URL
+    if [ $? -ne 0 ]
+    then
+        echo "ERROR (see above): Could not download dataset from url: "$URL
+        exit 1
+    fi
+       
 done
 
+
+# ---------------------------------
+# Unzip datasets
+
+echo "Downloaded datasets. Unpacking..."
+echo
+for FILE in $SAVEPATH/dataset_*.zip
+do
+    unzip $FILE -d synthetic_experiments/
+    if [ $? -ne 0 ]
+    then
+        echo "ERROR (see above): Could not unzip dataset from file: "$FILE
+        exit 1
+    fi
+done
+
+echo "Succesfully downloaded and unpacked datasets :)"
