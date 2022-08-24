@@ -4,20 +4,19 @@ This repository contains the code to reproduce the experiments and figures for t
 
 ## Software packages
 
-This repository contains only the code to reproduce the results from the paper.
+This repository contains only the code to reproduce the results from the paper. If you're interested in using the GnIES algorithm described in the paper for your own work, it is available as a separate and well-documented python package called `gnies`. You can find more information on its own repository at [github.com/juangamella/gnies](https://github.com/juangamella/gnies).
 
-If you're interested in using the GnIES algorithm described in the paper for your own work, it is available as a separate and well-documented python package called `gnies`. You can find more information on its own repository at [github.com/juangamella/gnies](https://github.com/juangamella/gnies).
-
-We use other relevant packages:
+We use the following python packages for the other algorithms:
 
 - `ges` for the [python implementation](https://github.com/juangamella/ges) of the GES algorithm
 - `gies` for the [python implementation](https://github.com/juangamella/gies) of the GIES algorithm
 - `causaldag` for UT-IGSP (see an [example](https://uhlerlab.github.io/causaldag/utigsp.html) and our [wrapper](https://github.com/juangamella/gnies-paper/blob/master/src/ut_igsp.py) including HSIC tests)
-- `sachs` to access the sachs dataset from a Python environment (see the [repository]())
+
+Additionally, we use the python package `sachs` for an easy way to access the sachs dataset from a Python environment (see the [repository]())
 
 ## Installing Dependencies
 
-We ran our experiments using `python=<TODO: version>`. The Python dependencies live in [`requirements.txt`](requirements.txt).
+We ran our experiments using `python=3.9.9`, but they should work on any version above `3.8`. The Python dependencies live in [`requirements.txt`](requirements.txt).
 
 For your convenience, a makefile is included to create a python virtual environment and install the necessary Python dependencies. To do this, simply run
 
