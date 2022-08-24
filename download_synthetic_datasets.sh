@@ -37,7 +37,7 @@ URLS=(
     "https://polybox.ethz.ch/index.php/s/gL09gDoxjzYqNuG/download"
     )
 
-SAVEPATH="/tmp/synthetic_experiments/"
+SAVEPATH="synthetic_experiments/"
 
 
 # ---------------------------------
@@ -80,7 +80,7 @@ echo "Downloaded datasets. Unpacking..."
 echo
 for FILE in $SAVEPATH/dataset_*.zip
 do
-    unzip $FILE -d synthetic_experiments/
+    unzip $FILE -d $SAVEPATH/synthetic_experiments/
     if [ $? -ne 0 ]
     then
         echo "ERROR (see above): Could not unzip dataset from file: "$FILE
