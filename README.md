@@ -48,8 +48,15 @@ Below are the exact instructions to reproduce all the experiments and figures us
 
 ### Synthetic Experiments (figure <TODO: Figure>)
 
-1. Download and unpack the datasets by executing the [script](download_synthetic_datasets.sh) ```./download_synthetic_datasets.sh```.
-2. Run the methods with the script [`run_synthetic.sh`](run_synthetic.sh). It will use a total of 4 threads (cores) to run the experiments; the number of threads can be set by editing the script and setting the variable `N_THREADS` to the desired value.
+1. Download and unpack the synthetic datasets
+```bash
+./download_synthetic_datasets.sh
+```
+2. Run the methods
+```bash
+./run_synthetic.sh
+```
+The script will use a total of 4 threads (cores) to run the experiments; the number of threads can be set by editing the script and setting the variable `N_THREADS` to the desired value.
 3. The results are stored in the `synthetic_experiments/`, in the sub-directory corresponding to each dataset.
 4. To generate the figures, use notebook [`<TODO: Notebook>`](figures_baseline_2.ipynb). The resulting figures are stored in the `figures/` directory.
 
