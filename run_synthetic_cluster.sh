@@ -30,13 +30,14 @@
 
 # Commands to run the synthetic experiments
 
+CLUSTER_PATH="/cluster/scratch/gajuan/"
 
 # --------------------------------------------------------------------
 # Figure 1: Model match, standardized data.
 
-DATASET=
+DATASET=$CLUSTER_PATH"synthetic_experiments/dataset_1661334599_runs:10_seed:42_tag:I3s_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:noise_i_size:1_i_v_min:5_i_v_max:10_n:10,100,1000_obs:1_standardize:1/test_cases.pickle"
 # The dataset was generated using the command:
-# python3 -m src.generate_synthetic_data --cluster --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type noise --obs --seed 42 --tag I3
+# python3 -m src.generate_synthetic_data --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type noise --obs --standardize --seed 42 --tag I3s
 
 # Run the methods: GnIES, UT-IGSP, GES and sortnregress
 bsub -n 50 -W 30:00 python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1 --directory $DATASET
@@ -48,9 +49,9 @@ bsub -n 50 -W 0:10 python3 -m src.run_sortnregress --n_workers 49 --pool --tag p
 # --------------------------------------------------------------------
 # Figure 2: Model mismatch, standardized data.
 
-DATASET=
+DATASET=$CLUSTER_PATH"synthetic_experiments/dataset_1661334633_runs:10_seed:42_tag:I3sd_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:do_i_size:1_i_v_min:5_i_v_max:10_n:10,100,1000_obs:1_standardize:1/test_cases.pickle"
 # The dataset was generated using the command:
-# python3 -m src.generate_synthetic_data --cluster --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type do --obs --seed 42 --tag I3sd
+# python3 -m src.generate_synthetic_data --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type do --obs --standardize --seed 42 --tag I3sd
 
 # Run the methods: GnIES, UT-IGSP, GES, GIES and sortnregress
 bsub -n 50 -W 30:00 python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1 --directory $DATASET
@@ -66,9 +67,9 @@ bsub -n 50 -W 0:10 python3 -m src.run_sortnregress --n_workers 49 --pool --tag p
 # -----------
 # Model match
 
-DATASET=
+DATASET=$CLUSTER_PATH"synthetic_experiments/dataset_1661334649_runs:10_seed:42_tag:I3_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:noise_i_size:1_i_v_min:5_i_v_max:10_n:10,100,1000_obs:1_standardize:0/test_cases.pickle"
 # The dataset was generated using the command:
-# python3 -m src.generate_synthetic_data --cluster --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type noise --obs --standardize --seed 42 --tag I3s
+# python3 -m src.generate_synthetic_data --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type noise --obs --seed 42 --tag I3
 
 # Run the methods: GnIES, UT-IGSP, GES and sortnregress
 bsub -n 50 -W 30:00 python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1 --directory $DATASET
@@ -80,9 +81,9 @@ bsub -n 50 -W 0:10 python3 -m src.run_sortnregress --n_workers 49 --pool --tag p
 # --------------
 # Model mismatch
 
-DATASET=
+DATASET=$CLUSTER_PATH"synthetic_experiments/dataset_1661334661_runs:10_seed:42_tag:I3d_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:do_i_size:1_i_v_min:5_i_v_max:10_n:10,100,1000_obs:1_standardize:0/test_cases.pickle"
 # The dataset was generated using the command:
-# python3 -m src.generate_synthetic_data --cluster --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type do --obs --standardize --seed 42 --tag I3sd
+# python3 -m src.generate_synthetic_data --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type do --obs --seed 42 --tag I3d
 
 # Run the methods: GnIES, UT-IGSP, GES, GIES and sortnregress
 bsub -n 50 -W 30:00 python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1 --directory $DATASET
