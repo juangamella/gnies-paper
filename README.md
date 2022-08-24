@@ -15,11 +15,9 @@ We use other relevant packages:
 - `causaldag` for UT-IGSP (see an [example](https://uhlerlab.github.io/causaldag/utigsp.html) and our [wrapper](https://github.com/juangamella/gnies-paper/blob/master/src/ut_igsp.py) including HSIC tests)
 - `sachs` to access the sachs dataset from a Python environment (see the [repository]())
 
-We additionally use the R and Python packages `drf` for the hybrid data generation using random forests.
-
 ## Installing Dependencies
 
-We ran our experiments using `python=<TODO: version>` and `R=<TODO: version>`. The required R packages can be found in [`R_requirements.txt`](R_requirements.txt). The Python dependencies live in [`requirements.txt`](requirements.txt).
+We ran our experiments using `python=<TODO: version>`. The Python dependencies live in [`requirements.txt`](requirements.txt).
 
 For your convenience, a makefile is included to create a python virtual environment and install the necessary Python dependencies. To do this, simply run
 
@@ -41,9 +39,12 @@ ipython kernel install --user --name=.venv
 
 and once inside the notebook select the kernel: `Kernel -> Change kernel -> .venv`.
 
+
 ## Reproducing the results
 
-Below are the exact instructions to reproduce all the experiments and figures used in the paper. Please note that, without access to a HPC cluster, completion of the experiments may take days or weeks. We ran our experiments on the Euler cluster of ETH Zürich - see the files [`run_baselines_cluster.sh`](run_baselines_cluster.sh) and [`run_comparisons_cluster.sh`](run_comparisons_cluster.sh) for details (i.e. number of cores, expected completion time, etc).
+Below are the exact instructions to reproduce all the experiments and figures used in the paper. Please note that, without access to a HPC cluster, completion of the experiments may take days or weeks. We ran our experiments on the Euler cluster of ETH Zürich - see the files [`run_synthetic_experiments_cluster.sh`](run_synthetic_experiments_cluster.sh) and [`run_sachs_experiments_cluster.sh`](run_sachs_experiments_cluster.sh) for details (i.e. number of cores, expected completion time, etc).
+
+We include all the datasets required to reproduce the experiments; the code to re-generate them can also be found in the files [`run_synthetic_experiments.sh`](run_synthetic_experiments.sh) and [`run_sachs_experiments.sh`](run_sachs_experiments.sh). However, to generate the hybrid datasets using Distributional Random Forests, you will additionally need the R and python packages `drf`. hybrid_data_requirements.txt constains instructions to install these dependencies. 
 
 
 ### Synthetic Experiments (Figure 1)
@@ -52,7 +53,7 @@ Below are the exact instructions to reproduce all the experiments and figures us
 ```bash
 ./download_synthetic_datasets.sh
 ```
-2. Run the methods. By default this will use a total of 4 threads (cores) to run the experiments; the number of threads can be set by editing the [script](run_synthetic_experiments.sh) and setting the variable `N_THREADS` to the desired value.
+2. Make sure the python environment is active (see above), and run the methods using the corresponding script. By default this will use a total of 4 threads (cores) to run the experiments; the number of threads can be set by editing the [script](run_synthetic_experiments.sh) and setting the variable `N_THREADS` to the desired value.
 ```bash
 ./run_synthetic_experiments.sh
 ```
@@ -67,7 +68,7 @@ The procedure is similar to the synthetic experiments:
 ```bash
 ./download_sachs_datasets.sh
 ```
-2. Run the methods. By default this will use a total of 4 threads (cores) to run the experiments; the number of threads can be set by editing the [script](run_sachs_experiments.sh) and setting the variable `N_THREADS` to the desired value.
+2. Make sure the python environment is active (see above) and run the methods using the corresponding script. By default this will use a total of 4 threads (cores) to run the experiments; the number of threads can be set by editing the [script](run_sachs_experiments.sh) and setting the variable `N_THREADS` to the desired value.
 ```bash
 ./run_sachs_experiments.sh
 ```
