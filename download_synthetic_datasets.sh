@@ -88,4 +88,5 @@ do
     fi
 done
 
+echo
 echo "Succesfully downloaded and unpacked datasets :)"
