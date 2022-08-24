@@ -46,25 +46,33 @@ and once inside the notebook select the kernel: `Kernel -> Change kernel -> .ven
 Below are the exact instructions to reproduce all the experiments and figures used in the paper. Please note that, without access to a HPC cluster, completion of the experiments may take days or weeks. We ran our experiments on the Euler cluster of ETH Zürich - see the files [`run_baselines_cluster.sh`](run_baselines_cluster.sh) and [`run_comparisons_cluster.sh`](run_comparisons_cluster.sh) for details (i.e. number of cores, expected completion time, etc).
 
 
-### Synthetic Experiments (figure <TODO: Figure>)
+### Synthetic Experiments (Figure 1)
 
 1. Download and unpack the synthetic datasets
 ```bash
 ./download_synthetic_datasets.sh
 ```
-2. Run the methods. By default the [script](run_synthetic_experiments.sh) will use a total of 4 threads (cores) to run the experiments; the number of threads can be set by editing the script and setting the variable `N_THREADS` to the desired value.
+2. Run the methods. By default this will use a total of 4 threads (cores) to run the experiments; the number of threads can be set by editing the [script](run_synthetic_experiments.sh) and setting the variable `N_THREADS` to the desired value.
 ```bash
 ./run_synthetic_experiments.sh
 ```
 3. The results are stored in the `synthetic_experiments/`, in the sub-directory corresponding to each dataset.
 4. To generate the figures, use notebook [`<TODO: Notebook>`](figures_baseline_2.ipynb). The resulting figures are stored in the `figures/` directory.
 
-### Real and Hybrid Data Experiments with the Sachs Dataset (figure <TODO: Figure>)
+### Real and Hybrid Data Experiments with the Sachs Dataset (Figure 3)
 
-1. Unzip the relevant datasets by executing the script [`unpack_sachs_datasets.sh`](unpack_sachs_datasets.sh)
-2. To run the methods, execute the script [`run_sachs.sh`](run_sachs.sh). It will use a total of 4 threads (cores) to run the experiments; the number of threads can be set by editing the script and setting the variable `N_THREADS` to the desired value.
-3. The results are stored in the `sachs_experiments/`, in the sub-directory corresponding to real and hybrid datasets.
-4. To generate the figures, use notebook [`<TODO: Notebook>`](figures_baseline_2.ipynb). Again, the resulting figures are stored in the `figures/` directory.
+The procedure is similar to the synthetic experiments:
+
+1. Download and unpack the Sachs dataset and the hybrid data
+```bash
+./download_sachs_datasets.sh
+```
+2. Run the methods. By default this will use a total of 4 threads (cores) to run the experiments; the number of threads can be set by editing the [script](run_sachs_experiments.sh) and setting the variable `N_THREADS` to the desired value.
+```bash
+./run_sachs_experiments.sh
+```
+3. The results are stored in the `sach_experiments/`, in the sub-directory corresponding to each dataset.
+4. To generate the figures, use notebook [`<TODO: Notebook>`](figures_baseline_2.ipynb). The resulting figures are stored in the `figures/` directory.
 
 ## Repository structure
 
@@ -77,7 +85,6 @@ You will find the following/files directories:
   - `src/run_gies.py` for GIES
   - `src/run_sortnregress.py` for sortnregress
 - `*_experiments` directories hold the datasets and the results from executing the experiments.
-  - Test
 - `figures_*.ipynb` are the jupyter notebooks used to generate the figures used in the paper. After execution, they are stored in the `figures/` directory.
 
 ## Feedback
