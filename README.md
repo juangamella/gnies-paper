@@ -1,6 +1,6 @@
-# Experiment Repository for <TODO: paper title>
+# Experiment Repository for *"Characterization and greedy learning of Gaussian structural causal models under unknown interventions"*
 
-This repository contains the code to reproduce the experiments and figures for the paper *"<TODO: paper title>"*, by JL. Gamella, A. Taeb, C. Heinze-Deml and P. Bühlmann. This README is not intended to be completely self-explanatory, and should be read alongside the manuscript (<TODO: link to arxiv>).
+This repository contains the code to reproduce the experiments and figures for the paper *"Characterization and greedy learning of Gaussian structural causal models under unknown interventions"*, by JL. Gamella, A. Taeb, C. Heinze-Deml and P. Bühlmann. This README is not intended to be completely self-explanatory, and should be read alongside the manuscript (<TODO: link to arxiv>).
 
 ## Software packages
 
