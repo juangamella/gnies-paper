@@ -14,7 +14,7 @@ We use the following python packages for the other algorithms:
 
 Additionally, we use the python package `sachs` for an easy way to access the sachs dataset from a Python environment (see the [repository]())
 
-## Installing Dependencies
+## Installing dependencies
 
 We ran our experiments using `python=3.9.9`, but they should work on any version above `3.8`. The Python dependencies live in [`requirements.txt`](requirements.txt). For your convenience, a makefile is included to create a python virtual environment and install the necessary Python dependencies. To do this, simply run
 
@@ -44,7 +44,7 @@ Below are the exact instructions to reproduce all the experiments and figures us
 We include all the datasets required to reproduce the experiments; the code to re-generate them can also be found in the files [`run_synthetic_experiments.sh`](run_synthetic_experiments.sh) and [`run_sachs_experiments.sh`](run_sachs_experiments.sh). However, to generate the hybrid datasets using Distributional Random Forests, you will additionally need the R and python packages `drf`. [`hybrid_data_requirements.txt`](hybrid_data_requirements.txt) constains instructions to install these dependencies. 
 
 
-### Synthetic Experiments (Figure 1)
+### Synthetic experiments (Figure 1)
 
 1. Download and unpack the synthetic datasets
 ```bash
@@ -57,7 +57,7 @@ We include all the datasets required to reproduce the experiments; the code to r
 3. The results are stored in the `synthetic_experiments/`, in the sub-directory corresponding to each dataset.
 4. To generate the figures, use notebook [`<TODO: Notebook>`](figures_baseline_2.ipynb). The resulting figures are stored in the `figures/` directory.
 
-### Real and Hybrid Data Experiments with the Sachs Dataset (Figure 3)
+### Real- and hybrid-data experiments with the Sachs dataset (Figure 3)
 
 The procedure is similar to the synthetic experiments:
 
