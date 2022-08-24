@@ -16,9 +16,7 @@ Additionally, we use the python package `sachs` for an easy way to access the sa
 
 ## Installing Dependencies
 
-We ran our experiments using `python=3.9.9`, but they should work on any version above `3.8`. The Python dependencies live in [`requirements.txt`](requirements.txt).
-
-For your convenience, a makefile is included to create a python virtual environment and install the necessary Python dependencies. To do this, simply run
+We ran our experiments using `python=3.9.9`, but they should work on any version above `3.8`. The Python dependencies live in [`requirements.txt`](requirements.txt). For your convenience, a makefile is included to create a python virtual environment and install the necessary Python dependencies. To do this, simply run
 
 ```sh
 make venv
@@ -43,7 +41,7 @@ and once inside the notebook select the kernel: `Kernel -> Change kernel -> .ven
 
 Below are the exact instructions to reproduce all the experiments and figures used in the paper. Please note that, without access to a HPC cluster, completion of the experiments may take days or weeks. We ran our experiments on the Euler cluster of ETH Zürich - see the files [`run_synthetic_experiments_cluster.sh`](run_synthetic_experiments_cluster.sh) and [`run_sachs_experiments_cluster.sh`](run_sachs_experiments_cluster.sh) for details (i.e. number of cores, expected completion time, etc).
 
-We include all the datasets required to reproduce the experiments; the code to re-generate them can also be found in the files [`run_synthetic_experiments.sh`](run_synthetic_experiments.sh) and [`run_sachs_experiments.sh`](run_sachs_experiments.sh). However, to generate the hybrid datasets using Distributional Random Forests, you will additionally need the R and python packages `drf`. [hybrid_data_requirements.txt](hybrid_data_requirements.txt) constains instructions to install these dependencies. 
+We include all the datasets required to reproduce the experiments; the code to re-generate them can also be found in the files [`run_synthetic_experiments.sh`](run_synthetic_experiments.sh) and [`run_sachs_experiments.sh`](run_sachs_experiments.sh). However, to generate the hybrid datasets using Distributional Random Forests, you will additionally need the R and python packages `drf`. [`hybrid_data_requirements.txt`](hybrid_data_requirements.txt) constains instructions to install these dependencies. 
 
 
 ### Synthetic Experiments (Figure 1)
@@ -78,7 +76,7 @@ The procedure is similar to the synthetic experiments:
 
 You will find the following/files directories:
 
-- `src/`: contains the python and R code to run the experiments. Each baseline is executed from its own python script:
+- `src/`: contains the Python code to run the experiments. Each baseline is executed from its own python script:
   - `src/run_gnies.py` for GnIES
   - `src/run_utigsp.py` for UT-IGSP
   - `src/run_ges.py` for GES
