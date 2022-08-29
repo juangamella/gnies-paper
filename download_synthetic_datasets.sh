@@ -80,7 +80,7 @@ echo "Downloaded datasets. Unpacking..."
 echo
 for FILE in $SAVEPATH/dataset_*.zip
 do
-    unzip $FILE -d $SAVEPATH/synthetic_experiments/
+    unzip $FILE -d $SAVEPATH/
     if [ $? -ne 0 ]
     then
         echo "ERROR (see above): Could not unzip dataset from file: "$FILE
