@@ -46,10 +46,10 @@ RAW_DATASET=$CLUSTER_PATH"sachs_experiments/dataset_1661368400_sachs_sachs_2005_
 #   >>> sachs.prepare_experiments_directory('sachs_experiments/', 'consensus', normalize=True)
 
 # Run the methods: GnIES, UT-IGSP with Gaussian and HSIC tests, GES
-bsub -n 6 -W 12:00 python3 -m src.run_gnies --n_workers 5 --lambdas 0.01,0.25,0.5,0.75,1 --directory $DATASET
+bsub -n 6 -W 12:00 python3 -m src.run_gnies --n_workers 5 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
 bsub -n 1 -W 1:00 python3 -m src.run_utigsp --n_workers 1 --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-20" --directory $DATASET
 bsub -n 32 -W 4:00 python3 -m src.run_utigsp --n_workers 8 --test hsic --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-20" --directory $DATASET
-bsub -n 1 -W 1:00 python3 -m src.run_ges --lambdas 0.01,0.25,0.5,0.75,1 --n_workers 1 --directory $DATASET
+bsub -n 1 -W 1:00 python3 -m src.run_ges --lambdas 0.01,0.25,0.5,0.75,1,2 --n_workers 1 --directory $DATASET
 
 
 # ----------------------------------------------------------------------
@@ -60,7 +60,7 @@ HYBRID_DATASET=$CLUSTER_PATH"sachs_experiments/dataset_1661774872_runs:10_seed:4
 # bsub -n 10 -W 1:00 python3 -m src.gen_hybrid_data --tag sachs_2005_normalized --type drf --runs 10 --directory sachs_experiments/ --dataset $RAW_DATASET/test_case_n:-1_g:0_r:0.npz --graph $RAW_DATASET/graph.npy --cluster
 
 # Run the methods: GnIES, UT-IGSP with Gaussian and HSIC tests, GES
-bsub -n 6 -W 12:00 python3 -m src.run_gnies --n_workers 5 --lambdas 0.01,0.25,0.5,0.75,1 --directory $HYBRID_DATASET
+bsub -n 6 -W 12:00 python3 -m src.run_gnies --n_workers 5 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $HYBRID_DATASET
 bsub -n 1 -W 1:00 python3 -m src.run_utigsp --n_workers 1 --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-20" --directory $HYBRID_DATASET
 bsub -n 32 -W 4:00 python3 -m src.run_utigsp --n_workers 8 --test hsic --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-20" --directory $HYBRID_DATASET
-bsub -n 1 -W 1:00 python3 -m src.run_ges --lambdas 0.01,0.25,0.5,0.75,1 --n_workers 1 --directory $HYBRID_DATASET
+bsub -n 1 -W 1:00 python3 -m src.run_ges --lambdas 0.01,0.25,0.5,0.75,1,2 --n_workers 1 --directory $HYBRID_DATASET
