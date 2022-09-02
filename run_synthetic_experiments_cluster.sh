@@ -86,7 +86,7 @@ DATASET=$CLUSTER_PATH"synthetic_experiments/dataset_1661334661_runs:10_seed:42_t
 # python3 -m src.generate_synthetic_data --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type do --obs --seed 42 --tag I3d
 
 # Run the methods: GnIES, UT-IGSP, GES, GIES and sortnregress
-bsub -n 50 -W 30:00 python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+bsub -n 50 -W 50:00 python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
 bsub -n 50 -W 0:30 python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory $DATASET
 bsub -n 50 -W 0:30 python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
 bsub -n 50 -W 0:30 python3 -m src.run_gies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
