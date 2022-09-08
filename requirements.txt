@@ -1,6 +1,6 @@
 numpy>=1.19.5
 sempler==0.2.4
-gnies==0.1.1
+gnies==0.2.0
 gies==0.0.1
 
 # For UT-IGSP

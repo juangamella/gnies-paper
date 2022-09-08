@@ -212,7 +212,7 @@ def run_method(info, debug=False):
         I0 = set()
     # Run method
     start = time.time()
-    output = gnies.fit(data, I0=I0, ges_lambda=lmbda, **gnies_options)
+    output = gnies.fit(data, I0=I0, lmbda=lmbda, **gnies_options)
     elapsed = time.time() - start
     print("  Ran GnIES on test case %s in %0.2f seconds." %
           (utils.serialize_dict(info), elapsed)) if debug else None
