@@ -201,6 +201,7 @@ def run_method(info, debug=False):
     n, graph, run = info["n"], info["g"], info["r"]
     data_path = args.directory + utils.test_case_filename(n, graph, run)
     data = utils.load_bin(data_path)
+    data = list(data)
     # Compute penalization parameter
     N = sum([len(X) for X in data])
     lmbda = info["l"] * np.log(N)
