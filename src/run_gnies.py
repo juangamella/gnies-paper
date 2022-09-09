@@ -176,10 +176,8 @@ gnies_phases = parse_phases(args.phases)
 if args.rank:
     approach = "rank"
     direction = gnies_phases[0]
-    gnies_phases = None
 else:
     approach = "greedy"
-    direction = None
 
 gnies_options = {
     "approach": approach,
