@@ -178,6 +178,7 @@ if args.rank:
     direction = gnies_phases[0]
 else:
     approach = "greedy"
+    direction = None
 
 gnies_options = {
     "approach": approach,
