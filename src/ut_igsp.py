@@ -29,7 +29,12 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 from causaldag.utils.ci_tests import gauss_ci_suffstat, gauss_ci_test, hsic_test, MemoizedCI_Tester
-from causaldag.utils.invariance_tests import gauss_invariance_suffstat, gauss_invariance_test, hsic_invariance_test, MemoizedInvarianceTester
+from causaldag.utils.invariance_tests import (
+    gauss_invariance_suffstat,
+    gauss_invariance_test,
+    hsic_invariance_test,
+    MemoizedInvarianceTester,
+)
 from causaldag import unknown_target_igsp
 
 import gnies.utils as utils
@@ -39,47 +44,40 @@ import gies.utils
 # TODO: icpdag=True here conflicts with the call from run_ut_igsp, refactor
 
 
-def fit(data, alpha_ci, alpha_inv, debug=0, completion='gnies', test='hsic'):
-    observational_sample = data[0]
-    interventional_samples = data[1:]
+def fit(data, alpha_ci, alpha_inv, debug=0, completion="gnies", test="hsic", obs_idx=0):
+    observational_sample = data[obs_idx]
+    interventional_samples = [sample for i, sample in enumerate(data) if i != obs_idx]
+    assert len(interventional_samples) + 1 == len(data)
     p = observational_sample.shape[1]
     nodes = set(range(p))
     # Build sufficient statistics and tests
-    if test == 'gauss':
+    if test == "gauss":
         # Form sufficient statistics
         ci_suffstat = gauss_ci_suffstat(observational_sample)
-        invariance_suffstat = gauss_invariance_suffstat(observational_sample,
-                                                        interventional_samples)
+        invariance_suffstat = gauss_invariance_suffstat(observational_sample, interventional_samples)
         # Create conditional independence tester and invariance tester
-        ci_tester = MemoizedCI_Tester(gauss_ci_test,
-                                      ci_suffstat,
-                                      alpha=alpha_ci)
-        invariance_tester = MemoizedInvarianceTester(gauss_invariance_test,
-                                                     invariance_suffstat,
-                                                     alpha=alpha_inv)
-    elif test == 'hsic':
+        ci_tester = MemoizedCI_Tester(gauss_ci_test, ci_suffstat, alpha=alpha_ci)
+        invariance_tester = MemoizedInvarianceTester(gauss_invariance_test, invariance_suffstat, alpha=alpha_inv)
+    elif test == "hsic":
         ci_tester = MemoizedCI_Tester(hsic_test, observational_sample, alpha=alpha_ci)
         suffstat = dict((i, sample) for i, sample in enumerate(interventional_samples))
-        suffstat['obs_samples'] = observational_sample
-        invariance_tester = MemoizedInvarianceTester(
-            hsic_invariance_test, suffstat, alpha=alpha_inv)
+        suffstat["obs_samples"] = observational_sample
+        invariance_tester = MemoizedInvarianceTester(hsic_invariance_test, suffstat, alpha=alpha_inv)
     else:
         raise ValueError('Invalid value "%s" for field "test"' % test)
     # Run UT-IGSP
     setting_list = [dict(known_interventions=[])] * (len(data) - 1)
-    estimated_dag, est_targets_list = unknown_target_igsp(
-        setting_list, nodes, ci_tester, invariance_tester)
+    estimated_dag, est_targets_list = unknown_target_igsp(setting_list, nodes, ci_tester, invariance_tester)
     # Process estimates
     estimated_dag = estimated_dag.to_amat()[0]
     estimated_I = set.union(*est_targets_list)
-    if completion == 'gnies':
+    if completion == "gnies":
         # Compute equivalence class using nI-equivalence (Gamella et. al 2022)
         estimated_icpdag = utils.dag_to_icpdag(estimated_dag, estimated_I)
-    elif completion == 'gies':
+    elif completion == "gies":
         # Compute equivalence class using the I-equivalence from Hauser & Bühlmann 2012
         targets = [list(t) for t in est_targets_list]
-        estimated_icpdag = gies.utils.replace_unprotected(
-            estimated_dag, targets)
+        estimated_icpdag = gies.utils.replace_unprotected(estimated_dag, targets)
     else:
         raise ValueError('Invalid value="%s" for field completion.')
     return (estimated_icpdag, estimated_I, estimated_dag)
