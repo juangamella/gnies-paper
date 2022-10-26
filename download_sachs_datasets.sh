@@ -35,7 +35,7 @@ URLS=(
     "https://polybox.ethz.ch/index.php/s/hsJlfqHrRRpwmTe/download"
     )
 
-if [[ $1 -eq "--cluster" ]]
+if [[ $1 -eq "-cluster" ]]
 then
     echo "CLUSTER MODE"
     SAVEPATH="/cluster/scratch/gajuan/sachs_experiments/"

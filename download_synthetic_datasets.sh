@@ -38,14 +38,12 @@ URLS=(
     # "https://polybox.ethz.ch/index.php/s/1PERd9GmqWmQIGK/download" # large 32GB dataset
     )
 
-if [[ $1 -eq "--cluster" ]]
-then
+if [[ $1 -eq "-cluster" ]]; then
     echo "CLUSTER MODE"
     SAVEPATH="/cluster/scratch/gajuan/synthetic_experiments/"
 else
     SAVEPATH="synthetic_experiments/"
 fi
-
 
 # ---------------------------------
 # Check that commands are installed
