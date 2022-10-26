@@ -35,8 +35,13 @@ URLS=(
     "https://polybox.ethz.ch/index.php/s/hsJlfqHrRRpwmTe/download"
     )
 
-SAVEPATH="sachs_experiments/"
-
+if [[ $1 -eq "--cluster" ]]
+then
+    echo "CLUSTER MODE"
+    SAVEPATH="/cluster/scratch/gajuan/sachs_experiments/"
+else
+    SAVEPATH="sachs_experiments/"
+fi
 
 # ---------------------------------
 # Check that commands are installed
