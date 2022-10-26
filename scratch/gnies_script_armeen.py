@@ -38,7 +38,7 @@ filenames = [
 # --------------------------------------------------------------------
 # Load data
 dataframes = [pd.read_csv(DATA_PATH + f) for f in filenames]
-data = [df.to_numpy()[:, 0:5] for df in dataframes]
+data = [df.to_numpy() for df in dataframes]
 
 print("Loaded data")
 N = 0
