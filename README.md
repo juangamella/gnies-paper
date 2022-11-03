@@ -12,7 +12,7 @@ We use the following python packages for the other algorithms:
 - `gies` for the [python implementation](https://github.com/juangamella/gies) of the GIES algorithm
 - `causaldag` for UT-IGSP (see an [example](https://uhlerlab.github.io/causaldag/utigsp.html) and our [wrapper](https://github.com/juangamella/gnies-paper/blob/master/src/ut_igsp.py) including HSIC tests)
 
-Additionally, we use the python package `sachs` for an easy way to access the sachs dataset from a Python environment (see the [repository]())
+Additionally, we use the python package [`sempler`](https://github.com/juangamella/sempler) to generate synthetic and semi-synthetic data for our experiments.
 
 ## Installing dependencies
 
@@ -54,8 +54,8 @@ We include all the datasets required to reproduce the experiments; the code to r
 ```bash
 ./run_synthetic_experiments.sh
 ```
-3. The results are stored in the `synthetic_experiments/`, in the sub-directory corresponding to each dataset.
-4. To generate the figures, use notebook [`<TODO: Notebook>`](figures_baseline_2.ipynb). The resulting figures are stored in the `figures/` directory.
+3. The results are stored in the `synthetic_experiments/` under the sub-directory corresponding to each dataset.
+4. To generate the figures, use notebooks [`figure_model_match.ipynb`](figure_model_match.ipynb) and [`figure_model_mismatch.ipynb`](figure_model_mismatch.ipynb). The resulting figures are stored in the `figures/` directory.
 
 ### Real- and hybrid-data experiments with the Sachs dataset (Figure 3)
 
@@ -69,8 +69,8 @@ The procedure is similar to the synthetic experiments:
 ```bash
 ./run_sachs_experiments.sh
 ```
-3. The results are stored in the `sach_experiments/`, in the sub-directory corresponding to each dataset.
-4. To generate the figures, use notebook [`<TODO: Notebook>`](figures_baseline_2.ipynb). The resulting figures are stored in the `figures/` directory.
+3. The results are stored in the `sach_experiments/` under the sub-directory corresponding to each dataset.
+4. To generate the figures, use notebook [`figures_sach_experiments.ipynb`](figures_sachs_experiments.ipynb). The resulting figures are stored in the `figures/` directory.
 
 ## Repository structure
 
