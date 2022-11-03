@@ -99,17 +99,3 @@ bsub -n 50 -W 0:30 python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 -
 bsub -n 50 -W 0:30 python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
 bsub -n 50 -W 0:30 python3 -m src.run_gies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
 bsub -n 50 -W 0:10 python3 -m src.run_sortnregress --n_workers 49 --pool --tag pool --directory $DATASET
-
-
-# --------------------------------------------------------------------
-# Figure ?? (Appendix D): GnIES vs GIES for higher sample sizes on hard-interventions data
-
-DATASET=$CLUSTER_PATH"synthetic_experiments/dataset_1666623094_runs:10_seed:42_tag:I3sdl_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:do_i_size:1_i_v_min:5_i_v_max:10_n:10000,100000_obs:1_standardize:1/"
-# The dataset was generated using the command:
-# python3 -m src.generate_synthetic_data --G 100 --runs 10 --n 10000,100000 --i_size 1 --e 4 --p 10 --i_type do --obs --standardize --seed 42 --tag I3sdl
-
-# Run the methods: GnIES, GIES, UT-IGSP, GES
-bsub -n 50 -W 8:00 python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
-bsub -n 50 -W 0:30 python3 -m src.run_gies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
-bsub -n 50 -W 0:30 python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory $DATASET
-bsub -n 50 -W 0:30 python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET

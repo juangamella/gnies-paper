@@ -35,7 +35,6 @@ URLS=(
     "https://polybox.ethz.ch/index.php/s/8xz0zL6YTnl52sM/download"
     "https://polybox.ethz.ch/index.php/s/b4xpDUanh5S4Hdw/download"
     "https://polybox.ethz.ch/index.php/s/gL09gDoxjzYqNuG/download"
-    # "https://polybox.ethz.ch/index.php/s/1PERd9GmqWmQIGK/download" # large 32GB dataset
     )
 
 if [[ $1 -eq "-cluster" ]]; then
