@@ -41,7 +41,7 @@ and once inside the notebook select the kernel: `Kernel -> Change kernel -> .ven
 
 Below are the exact instructions to reproduce all the experiments and figures used in the paper. Please note that, without access to a HPC cluster, completion of the experiments may take days or weeks. We ran our experiments on the Euler cluster of ETH Zürich - see the files [`run_synthetic_experiments_cluster.sh`](run_synthetic_experiments_cluster.sh) and [`run_sachs_experiments_cluster.sh`](run_sachs_experiments_cluster.sh) for details (i.e. number of cores, expected completion time, etc).
 
-We include all the datasets required to reproduce the experiments; the code to re-generate them can also be found in the files [`run_synthetic_experiments.sh`](run_synthetic_experiments.sh) and [`run_sachs_experiments.sh`](run_sachs_experiments.sh). However, to generate the hybrid datasets using Distributional Random Forests, you will additionally need the R and python packages `drf`. [`hybrid_data_requirements.txt`](hybrid_data_requirements.txt) constains instructions to install these dependencies. 
+We include all the datasets required to reproduce the experiments; the code to re-generate them can also be found in the files [`run_synthetic_experiments.sh`](run_synthetic_experiments.sh) and [`run_sachs_experiments.sh`](run_sachs_experiments.sh). However, to re-generate the semi-synthetic datasets you will need some additional `R` dependencies (see [sempler's documentation](<TODO: Link)).
 
 
 ### Synthetic experiments (Figures 1 and 2)
@@ -57,7 +57,7 @@ We include all the datasets required to reproduce the experiments; the code to r
 3. The results are stored in the `synthetic_experiments/` under the sub-directory corresponding to each dataset.
 4. To generate the figures, use notebooks [`figure_model_match.ipynb`](figure_model_match.ipynb) and [`figure_model_mismatch.ipynb`](figure_model_mismatch.ipynb). The resulting figures are stored in the `figures/` directory.
 
-### Real- and hybrid-data experiments with the Sachs dataset (Figure 3)
+### Real and semi-synthetic data experiments with the Sachs dataset (Figure 3)
 
 The procedure is similar to the synthetic experiments:
 
@@ -83,7 +83,7 @@ You will find the following/files directories:
   - `src/run_gies.py` for GIES
   - `src/run_sortnregress.py` for sortnregress
 - `*_experiments` directories hold the datasets and the results from executing the experiments.
-- `figures_*.ipynb` are the jupyter notebooks used to generate the figures used in the paper. After execution, they are stored in the `figures/` directory.
+- `figure*.ipynb` are the jupyter notebooks used to generate the figures used in the paper. Figures are stored in the `figures/` directory.
 
 ## Feedback
 
