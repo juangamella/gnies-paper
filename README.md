@@ -1,6 +1,6 @@
 # Experiment Repository for *"Characterization and greedy learning of Gaussian structural causal models under unknown noise interventions"*
 
-This repository contains the code to reproduce the experiments and figures for the paper *"Characterization and greedy learning of Gaussian structural causal models under unknown interventions"*, by JL. Gamella, A. Taeb, C. Heinze-Deml and P. Bühlmann. This README is not intended to be completely self-explanatory, and should be read alongside the manuscript (<TODO: link to arxiv>).
+This repository contains the code to reproduce the experiments and figures for the paper *"Characterization and greedy learning of Gaussian structural causal models under unknown noise interventions"*, by JL. Gamella, A. Taeb, C. Heinze-Deml and P. Bühlmann. This README is not intended to be completely self-explanatory, and should be read alongside the manuscript (<TODO: link to arxiv>).
 
 ## Software packages
 
@@ -44,7 +44,7 @@ Below are the exact instructions to reproduce all the experiments and figures us
 We include all the datasets required to reproduce the experiments; the code to re-generate them can also be found in the files [`run_synthetic_experiments.sh`](run_synthetic_experiments.sh) and [`run_sachs_experiments.sh`](run_sachs_experiments.sh). However, to generate the hybrid datasets using Distributional Random Forests, you will additionally need the R and python packages `drf`. [`hybrid_data_requirements.txt`](hybrid_data_requirements.txt) constains instructions to install these dependencies. 
 
 
-### Synthetic experiments (Figure 1)
+### Synthetic experiments (Figures 1 and 2)
 
 1. Download and unpack the synthetic datasets
 ```bash
