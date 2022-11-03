@@ -42,6 +42,31 @@ import gies.utils
 # Auxiliary functions
 
 
+def _regress(j, pa, cov):
+    # compute the regression coefficients from the
+    # empirical covariance (scatter) matrix i.e. b =
+    # Σ_{j,pa(j)} @ Σ_{pa(j), pa(j)}^-1
+    return np.linalg.solve(cov[pa, :][:, pa], cov[j, pa])
+
+
+def B_via_fitting(A, covariance):
+    B = np.zeros_like(covariance)
+    for j in range(len(covariance)):
+        pa = list(np.where(A[:, j] != 0)[0])
+        B[pa, j] = _regress(j, pa, covariance)
+    return B
+
+
+def check_model_truthfulness(scm, interventions, equiv_class):
+    I_B_inv = np.linalg.inv(np.eye(scm.p) - scm.W.T)
+    for intervention in interventions:
+        covariance = scm.sample(population=True, **intervention).covariance
+        for A in equiv_class:
+            B = B_via_fitting(A, covariance)
+            M = (np.eye(scm.p) - B.T) @ I_B_inv
+            assert (np.diag(M) != 0).all()
+
+
 def all_dags(PDAG):
     """A wrapper for gnies.utils.all_dags but with protection against too
     large MECs"""
@@ -61,8 +86,7 @@ def compute_metrics(estimates, ground_truth, metric_functions, trans_function, n
     their score when compared to the ground truth"""
     assert len(ground_truth) == len(estimates)
     # Initialize the dictionary of arrays where results will be stored
-    computed_metrics = dict((metric, np.empty_like(estimates, dtype=float))
-                            for metric in metric_functions)
+    computed_metrics = dict((metric, np.empty_like(estimates, dtype=float)) for metric in metric_functions)
     # Iterate over each test case
     for i, case_estimates in enumerate(estimates):
         if debug:
@@ -73,12 +97,10 @@ def compute_metrics(estimates, ground_truth, metric_functions, trans_function, n
         # Compute the requested metrics for each transformed estimate
         for metric in metric_functions:
             metric_function = utils.if_none(metric, np.nan) if noneify else metric
-            case_results = [metric_function(estimate, ground_truth[i])
-                            for estimate in transformed_estimates]
+            case_results = [metric_function(estimate, ground_truth[i]) for estimate in transformed_estimates]
             # Store result in the corresponding array, reshaping the
             # flattened array of transformed estimates
-            computed_metrics[metric][i] = np.reshape(
-                case_results, computed_metrics[metric][i].shape)
+            computed_metrics[metric][i] = np.reshape(case_results, computed_metrics[metric][i].shape)
     # Return
     print() if debug else None
     return computed_metrics
@@ -138,7 +160,7 @@ for i, case in enumerate(info["cases"]):
     if isinstance(case, np.ndarray) and case.ndim == 2:
         singleton = True
         dag = case
-        union = set(range(info['args'].p))
+        union = set(range(info["args"].p))
     # Ground truth is an SCM + interventions
     elif isinstance(case, tuple) and len(case) == 2:
         singleton = False
@@ -173,6 +195,10 @@ for i, case in enumerate(info["cases"]):
     # Compute true equivalence class
     true_class = gnies.utils.all_dags(icpdag)
     print("    %d DAGs in the true equiv. class" % len(true_class))
+    # Check model-truthfulness assumption is satisfied
+    if not singleton:
+        check_model_truthfulness(scm, interventions, true_class)
+        print("    Model-truthfulness satisfied")
     ground_truth_classes[i] = true_class
     # Compute skeleton of equiv. graphs
     ground_truth_skeletons[i] = gnies.utils.skeleton(dag)
@@ -190,8 +216,7 @@ print("Computing metrics")
 
 for method in methods:
     # Read the method's result file
-    method_info, results = utils.read_pickle(
-        args.directory + utils.compiled_results_filename(method))
+    method_info, results = utils.read_pickle(args.directory + utils.compiled_results_filename(method))
     print("\n  method = %s" % method)
     print("     which was run with settings")
     print("       ", method_info)
@@ -209,8 +234,7 @@ for method in methods:
     # Compute skeleton recovery
     print("    computing skeleton metrics")
     funs = [metrics.type_1_skeleton, metrics.type_2_skeleton]
-    skeleton_metrics = compute_metrics(
-        estimates, ground_truth_skeletons, funs, gnies.utils.skeleton)
+    skeleton_metrics = compute_metrics(estimates, ground_truth_skeletons, funs, gnies.utils.skeleton)
     method_metrics.update(skeleton_metrics)
     # ------------------------------------
     # Compute intervention target recovery
@@ -229,8 +253,7 @@ for method in methods:
     # Compute proportion of times that method produced an estimate
     print("    computing method success")
     funs = [metrics.success_metric]
-    success_metric = compute_metrics(estimates, ground_truth_icpdags,
-                                     funs, lambda x: x, noneify=False)
+    success_metric = compute_metrics(estimates, ground_truth_icpdags, funs, lambda x: x, noneify=False)
     method_metrics.update(success_metric)
     # -----------------------------
     # Compute elapsed times metrics
