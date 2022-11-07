@@ -1,4 +1,4 @@
-# Experiment Repository for *"Characterization and greedy learning of Gaussian structural causal models under unknown noise interventions"*
+# Experiment Repository for *"Characterization and greedy learning of Gaussian structural causal models under unknown interventions"*
 
 This repository contains the code to reproduce the experiments and figures for the paper *"Characterization and greedy learning of Gaussian structural causal models under unknown noise interventions"*, by JL. Gamella, A. Taeb, C. Heinze-Deml and P. Bühlmann. This README is not intended to be completely self-explanatory, and should be read alongside the manuscript (<TODO: link to arxiv>).
 
