@@ -29,3 +29,76 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 # Commands to run the synthetic experiments
+
+# --------------------------------------------------------------------
+# Figure 1: Model match, standardized data.
+
+DATASET="synthetic_experiments/dataset_1661334599_runs:10_seed:42_tag:I3s_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:noise_i_size:1_i_v_min:5_i_v_max:10_n:10,100,1000_obs:1_standardize:1/"
+# The dataset was generated using the command:
+# python3 -m src.generate_synthetic_data --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type noise --obs --standardize --seed 42 --tag I3s
+
+# Run the methods: GnIES, UT-IGSP, GES and sortnregress
+python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+python3 -m src.run_gnies --rank --phases f --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+python3 -m src.run_gnies --rank --phases b --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory $DATASET
+python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+python3 -m src.run_sortnregress --n_workers 49 --pool --tag pool --directory $DATASET
+
+./compute_metrics.sh $DATASET
+
+# --------------------------------------------------------------------
+# Figure 2: Model mismatch, standardized data.
+
+DATASET="synthetic_experiments/dataset_1661334633_runs:10_seed:42_tag:I3sd_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:do_i_size:1_i_v_min:5_i_v_max:10_n:10,100,1000_obs:1_standardize:1/"
+# The dataset was generated using the command:
+# python3 -m src.generate_synthetic_data --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type do --obs --standardize --seed 42 --tag I3sd
+
+# Run the methods: GnIES, UT-IGSP, GES, GIES and sortnregress
+python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+python3 -m src.run_gnies --rank --phases f --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+python3 -m src.run_gnies --rank --phases b --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory $DATASET
+python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+python3 -m src.run_gies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+python3 -m src.run_sortnregress --n_workers 49 --pool --tag pool --directory $DATASET
+
+./compute_metrics.sh $DATASET
+
+# --------------------------------------------------------------------
+# Figure 6 (Appendix D): Comparison with raw (unstandardized) data
+
+# -----------
+# Model match
+
+DATASET="synthetic_experiments/dataset_1661334649_runs:10_seed:42_tag:I3_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:noise_i_size:1_i_v_min:5_i_v_max:10_n:10,100,1000_obs:1_standardize:0/"
+# The dataset was generated using the command:
+# python3 -m src.generate_synthetic_data --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type noise --obs --seed 42 --tag I3
+
+# Run the methods: GnIES, UT-IGSP, GES and sortnregress
+python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+python3 -m src.run_gnies --rank --phases f --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+python3 -m src.run_gnies --rank --phases b --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory $DATASET
+python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+python3 -m src.run_sortnregress --n_workers 49 --pool --tag pool --directory $DATASET
+
+./compute_metrics.sh $DATASET
+
+# --------------
+# Model mismatch
+
+DATASET="synthetic_experiments/dataset_1661334661_runs:10_seed:42_tag:I3d_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:do_i_size:1_i_v_min:5_i_v_max:10_n:10,100,1000_obs:1_standardize:0/"
+# The dataset was generated using the command:
+# python3 -m src.generate_synthetic_data --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type do --obs --seed 42 --tag I3d
+
+# Run the methods: GnIES, UT-IGSP, GES, GIES and sortnregress
+python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+python3 -m src.run_gnies --rank --phases f --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+python3 -m src.run_gnies --rank --phases b --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory $DATASET
+python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+python3 -m src.run_gies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+python3 -m src.run_sortnregress --n_workers 49 --pool --tag pool --directory $DATASET
+
+./compute_metrics.sh $DATASET
