@@ -2,6 +2,16 @@
 
 This repository contains the code to reproduce the experiments and figures for the paper *"Characterization and Greedy Learning of Gaussian Structural Causal Models under Unknown Interventions"*, by JL. Gamella, A. Taeb, C. Heinze-Deml and P. Bühlmann. This README is not intended to be completely self-explanatory, and should be read alongside the manuscript (<TODO: link to arxiv>).
 
+If you find this code useful, please consider citing:
+
+```
+@article{gamella2022characterization,
+  title={Characterization and Greedy Learning of Gaussian Structural Causal Models under Unknown Interventions},
+  author={Gamella, Juan L. and Taeb, Armeen and Heinze-Deml, Christina and B\"uhlmann, Peter},
+  year={2022}
+}
+```
+
 ## Software packages
 
 This repository contains only the code to reproduce the results from the paper. If you're interested in using the GnIES algorithm described in the paper for your own work, it is available as a separate and well-documented python package called `gnies`. You can find more information on its own repository at [github.com/juangamella/gnies](https://github.com/juangamella/gnies).
