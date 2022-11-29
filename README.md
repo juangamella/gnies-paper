@@ -1,6 +1,6 @@
 # Experiment Repository for *"Characterization and greedy learning of Gaussian structural causal models under unknown interventions"*
 
-This repository contains the code to reproduce the experiments and figures for the paper *"Characterization and Greedy Learning of Gaussian Structural Causal Models under Unknown Interventions"*, by JL. Gamella, A. Taeb, C. Heinze-Deml and P. Bühlmann. This README is not intended to be completely self-explanatory, and should be read alongside the manuscript (<TODO: link to arxiv>).
+This repository contains the code to reproduce the experiments and figures for the paper [*"Characterization and Greedy Learning of Gaussian Structural Causal Models under Unknown Interventions"*](https://arxiv.org/abs/2211.14897), by JL. Gamella, A. Taeb, C. Heinze-Deml and P. Bühlmann. This README is not intended to be completely self-explanatory, and should be read alongside the [manuscript](https://arxiv.org/pdf/2211.14897.pdf).
 
 If you find this code useful, please consider citing:
 
@@ -51,7 +51,7 @@ and once inside the notebook select the kernel: `Kernel -> Change kernel -> .ven
 
 Below are the exact instructions to reproduce all the experiments and figures used in the paper. Please note that, without access to a HPC cluster, completion of the experiments may take days or weeks. We ran our experiments on the Euler cluster of ETH Zürich - see the files [`run_synthetic_experiments_cluster.sh`](run_synthetic_experiments_cluster.sh) and [`run_sachs_experiments_cluster.sh`](run_sachs_experiments_cluster.sh) for details (i.e. number of cores, expected completion time, etc).
 
-We include all the datasets required to reproduce the experiments; the code to re-generate them can also be found in the files [`run_synthetic_experiments.sh`](run_synthetic_experiments.sh) and [`run_sachs_experiments.sh`](run_sachs_experiments.sh). Although not necessary, if you wish to re-generate the semi-synthetic datasets you will need some additional `R` dependencies (see [sempler's documentation](<TODO: Link)).
+We include all the datasets required to reproduce the experiments; the code to re-generate them can also be found in the files [`run_synthetic_experiments.sh`](run_synthetic_experiments.sh) and [`run_sachs_experiments.sh`](run_sachs_experiments.sh). Although not necessary, if you wish to re-generate the semi-synthetic datasets you will need some additional `R` dependencies (see [sempler's documentation](https://sempler.readthedocs.io/en/latest/drfnet.html)).
 
 
 ### Synthetic experiments (Figures 1 and 2)
