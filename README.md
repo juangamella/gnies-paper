@@ -20,7 +20,7 @@ We use the following python packages for the other algorithms:
 
 - `ges` for the [python implementation](https://github.com/juangamella/ges) of the GES algorithm
 - `gies` for the [python implementation](https://github.com/juangamella/gies) of the GIES algorithm
-- `causaldag` for UT-IGSP (see an [example](https://uhlerlab.github.io/causaldag/utigsp.html) and our [wrapper](https://github.com/juangamella/gnies-paper/blob/master/src/ut_igsp.py) including HSIC tests)
+- `causaldag` for UT-IGSP (see an [example](https://uhlerlab.github.io/causaldag/utigsp.html) and our [wrapper](https://github.com/juangamella/gnies-paper/blob/master/src/ut_igsp.py) including KCI tests)
 
 Additionally, we use the python package [`sempler`](https://github.com/juangamella/sempler) to generate synthetic and semi-synthetic data for our experiments.
 
