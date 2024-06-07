@@ -38,6 +38,7 @@ import argparse
 import os
 import causalchamber
 import pandas as pd
+import time
 
 # --------------------------------------------------------------------
 # Variable names
@@ -88,8 +89,7 @@ def load_dataset():
     return dataframes
 
 
-def prepare_experiments_directory(directory, Ns, runs):
-    directory += "" if directory[-1] == "/" else "/"
+def prepare_experiments_directory(path, Ns, runs):
     # Load ground-truth graph
     graph = (
         causalchamber.ground_truth.graph("lt", "standard")
@@ -109,6 +109,8 @@ def prepare_experiments_directory(directory, Ns, runs):
         "variables": variables,
     }
     # Write test case info
+    path += "" if path[-1] == "/" else "/"
+    directory = path + "dataset_%d_light_tunnel/" % time.time()
     os.makedirs(directory)
     filename = directory + utils.INFO_FILENAME
     utils.write_pickle(filename, to_save)
@@ -124,5 +126,6 @@ def prepare_experiments_directory(directory, Ns, runs):
             data = [
                 df[variables].sample(n=n, random_state=r).values for df in dataframes
             ]
+            data = utils.standardize(data)
             filename = directory + utils.test_case_filename(n, 0, r)
             utils.data_to_bin(data, filename, debug=True)
