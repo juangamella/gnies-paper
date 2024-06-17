@@ -85,7 +85,7 @@ arguments = {
     # GnIES parameters
     "rank": {"default": False, "type": bool},
     "phases": {"default": "fb", "type": str},
-    "fit_intercept": {"default": False, "type": bool},
+    "fit_means": {"default": False, "type": bool},
     "ges_one_run": {"default": False, "type": bool},
     "ges_phases": {"default": "fbt", "type": str},
     "lambda_lo": {"default": 0.5, "type": float},
@@ -120,6 +120,8 @@ else:
 METHOD_NAME += "_" + args.phases
 if args.rank:
     METHOD_NAME += "_" + "rank"
+if args.fit_means:
+    METHOD_NAME += "_" + "means"
 
 # --------------------------------------------------------------------
 # Run algorithm on samples
@@ -149,7 +151,7 @@ else:
 fields = [range(n_cases), lmbdas, Ns, range(runs)]
 
 iterable = []
-for (graph, lmbda, sample_size, run) in gnies.utils.cartesian(fields, dtype=object):
+for graph, lmbda, sample_size, run in gnies.utils.cartesian(fields, dtype=object):
     iterable.append({"l": lmbda, "n": sample_size, "g": graph, "r": run})
 assert len(iterable) == n_samples * len(lmbdas)
 
@@ -184,6 +186,7 @@ gnies_options = {
     "approach": approach,
     "phases": gnies_phases,
     "direction": direction,
+    "center": args.fit_means,
     "ges_iterate": not args.ges_one_run,
     "ges_phases": ges_phases,
     "debug": args.gnies_verbose,
@@ -205,7 +208,7 @@ def run_method(info, debug=False):
     N = sum([len(X) for X in data])
     lmbda = info["l"] * np.log(N)
     # Set initial set of interventions
-    if gnies_phases[0] == 'backward':
+    if gnies_phases[0] == "backward":
         I0 = set(range(p))
     else:
         I0 = set()
@@ -213,8 +216,10 @@ def run_method(info, debug=False):
     start = time.time()
     output = gnies.fit(data, I0=I0, lmbda=lmbda, **gnies_options)
     elapsed = time.time() - start
-    print("  Ran GnIES on test case %s in %0.2f seconds." %
-          (utils.serialize_dict(info), elapsed)) if debug else None
+    print(
+        "  Ran GnIES on test case %s in %0.2f seconds."
+        % (utils.serialize_dict(info), elapsed)
+    ) if debug else None
     # Store results
     score, estimated_icpdag, estimated_I = output
     result = {
@@ -324,7 +329,9 @@ if not args.compile_only:
             pool.map(worker, iterable, chunksize=args.chunksize)
 
     end = time.time()
-    print("\n\nFinished experiments at %s (elapsed %0.2f seconds)\n\n" %
-          (datetime.now(), end - start))
+    print(
+        "\n\nFinished experiments at %s (elapsed %0.2f seconds)\n\n"
+        % (datetime.now(), end - start)
+    )
 
 process_results()
