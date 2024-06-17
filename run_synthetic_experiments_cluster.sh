@@ -112,6 +112,7 @@ DATASET=$CLUSTER_PATH"synthetic_experiments/dataset_1718195408_runs:10_seed:42_t
 
 # Run the methods: GnIES, UT-IGSP, GES and sortnregress
 sbatch --ntasks=50 --time=8:00:00 --wrap='python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=8:00:00 --wrap='python3 -m src.run_gnies --fit_means --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
 sbatch --ntasks=50 --time=2:00:00 --wrap='python3 -m src.run_gnies --rank --phases f --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
 sbatch --ntasks=50 --time=2:00:00 --wrap='python3 -m src.run_gnies --rank --phases b --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
 sbatch --ntasks=50 --time=0:30:00 --wrap='python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory "'$DATASET'"'
@@ -127,6 +128,7 @@ DATASET=$CLUSTER_PATH"synthetic_experiments/dataset_1718195820_runs:10_seed:42_t
 
 # Run the methods: GnIES, UT-IGSP, GES and sortnregress
 sbatch --ntasks=50 --time=8:00:00 --wrap='python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=8:00:00 --wrap='python3 -m src.run_gnies --fit_means --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
 sbatch --ntasks=50 --time=2:00:00 --wrap='python3 -m src.run_gnies --rank --phases f --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
 sbatch --ntasks=50 --time=2:00:00 --wrap='python3 -m src.run_gnies --rank --phases b --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
 sbatch --ntasks=50 --time=0:30:00 --wrap='python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory "'$DATASET'"'
@@ -136,12 +138,13 @@ sbatch --ntasks=50 --time=0:10:00 --wrap='python3 -m src.run_sortnregress --n_wo
 # --------------------------
 # No change in variance, mean shift
 
-DATASET=$CLUSTER_PATH"TODO"
+DATASET=$CLUSTER_PATH"synthetic_experiments/dataset_1718636634_runs:10_seed:42_tag:om_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:noise_i_size:1_i_m_min:3.0_i_m_max:4.0_i_v_min:0.0_i_v_max:0.0_n:10,100,1000_obs:1_standardize:1/"
 # The dataset was generated using the command:
-# python3-m src.generate_synthetic_data --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type noise --obs --standardize --seed 42 --tag om --i_v_min 0 --i_v_max 0 --i_m_min 3 --i_m_min 4
+# python3 -m src.generate_synthetic_data --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type noise --obs --standardize --seed 42 --tag om --i_v_min 0 --i_v_max 0 --i_m_min 3 --i_m_max 4
 
 # Run the methods: GnIES, UT-IGSP, GES and sortnregress
 sbatch --ntasks=50 --time=8:00:00 --wrap='python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=8:00:00 --wrap='python3 -m src.run_gnies --fit_means --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
 sbatch --ntasks=50 --time=2:00:00 --wrap='python3 -m src.run_gnies --rank --phases f --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
 sbatch --ntasks=50 --time=2:00:00 --wrap='python3 -m src.run_gnies --rank --phases b --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
 sbatch --ntasks=50 --time=0:30:00 --wrap='python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory "'$DATASET'"'
@@ -151,12 +154,13 @@ sbatch --ntasks=50 --time=0:10:00 --wrap='python3 -m src.run_sortnregress --n_wo
 # --------------------------
 # Small change in variance, means shift
 
-DATASET=$CLUSTER_PATH"TODO"
+DATASET=$CLUSTER_PATH"synthetic_experiments/dataset_1718636499_runs:10_seed:42_tag:wkm_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:noise_i_size:1_i_m_min:3.0_i_m_max:4.0_i_v_min:3.0_i_v_max:4.0_n:10,100,1000_obs:1_standardize:1"
 # The dataset was generated using the command:
-# python3-m src.generate_synthetic_data --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type noise --obs --standardize --seed 42 --tag weakm --i_v_min 3 --i_v_max 4 --i_m_min 3 --i_m_min 4
+# python3 -m src.generate_synthetic_data --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type noise --obs --standardize --seed 42 --tag wkm --i_v_min 3 --i_v_max 4 --i_m_min 3 --i_m_max 4
 
 # Run the methods: GnIES, UT-IGSP, GES and sortnregress
 sbatch --ntasks=50 --time=8:00:00 --wrap='python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=8:00:00 --wrap='python3 -m src.run_gnies --fit_means --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
 sbatch --ntasks=50 --time=2:00:00 --wrap='python3 -m src.run_gnies --rank --phases f --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
 sbatch --ntasks=50 --time=2:00:00 --wrap='python3 -m src.run_gnies --rank --phases b --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
 sbatch --ntasks=50 --time=0:30:00 --wrap='python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory "'$DATASET'"'
@@ -166,12 +170,13 @@ sbatch --ntasks=50 --time=0:10:00 --wrap='python3 -m src.run_sortnregress --n_wo
 # --------------------------
 # Reduction in variance, means shift
 
-DATASET=$CLUSTER_PATH"TODO"
+DATASET=$CLUSTER_PATH"synthetic_experiments/dataset_1718636392_runs:10_seed:42_tag:smm_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:noise_i_size:1_i_m_min:3.0_i_m_max:4.0_i_v_min:0.1_i_v_max:0.2_n:10,100,1000_obs:1_standardize:1/"
 # The dataset was generated using the command:
-# python3-m src.generate_synthetic_data --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type noise --obs --standardize --seed 42 --tag smallm --i_v_min 0.1 --i_v_max 0.2 --i_m_min 3 --i_m_min 4
+# python3 -m src.generate_synthetic_data --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type noise --obs --standardize --seed 42 --tag smm --i_v_min 0.1 --i_v_max 0.2 --i_m_min 3 --i_m_max 4
 
 # Run the methods: GnIES, UT-IGSP, GES and sortnregress
 sbatch --ntasks=50 --time=8:00:00 --wrap='python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=8:00:00 --wrap='python3 -m src.run_gnies --fit_means --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
 sbatch --ntasks=50 --time=2:00:00 --wrap='python3 -m src.run_gnies --rank --phases f --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
 sbatch --ntasks=50 --time=2:00:00 --wrap='python3 -m src.run_gnies --rank --phases b --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
 sbatch --ntasks=50 --time=0:30:00 --wrap='python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory "'$DATASET'"'
