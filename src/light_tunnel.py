@@ -44,18 +44,40 @@ import time
 # Variable names
 
 # Mapping from experiments -> environments
+
+# rgb
+environments = [
+    ["uniform_reference"],  # reference environment
+    ["uniform_red_mid", "uniform_red_strong"],  # intervention on R
+    ["uniform_green_mid", "uniform_green_strong"],  # intervention on G
+    ["uniform_blue_mid", "uniform_blue_strong"],  # intervention on B
+]
+
+
+# rgb1
 environments = [
     ["uniform_reference"],  # reference environment
     ["uniform_red_mid", "uniform_red_strong"],  # intervention on R
     ["uniform_green_mid", "uniform_green_strong"],  # intervention on G
     ["uniform_blue_mid", "uniform_blue_strong"],  # intervention on B
     ["uniform_pol_1_mid", "uniform_pol_1_strong"],  # intervention on \theta_1
-    ["uniform_pol_2_mid", "uniform_pol_2_strong"],  # intervention on \theta_2
-    ["uniform_t_ir_1_strong"],
-    ["uniform_t_ir_2_strong"],
-    ["uniform_t_ir_3_strong"],
-    ["uniform_osr_angle_1_strong"],  # intervention on \tilde{\theta}_1 (through O_1)
-    ["uniform_osr_angle_2_strong"],  # intervention on \tilde{\theta}_2 (through O_2)
+]
+
+# rgb1_means
+environments = [
+    ["uniform_reference"],  # reference environment
+    ["uniform_red_strong"],  # intervention on R
+    ["uniform_green_strong"],  # intervention on G
+    ["uniform_blue_strong"],  # intervention on B
+    ["uniform_pol_1_strong"],  # intervention on \theta_1
+]
+
+# rgb_means
+environments = [
+    ["uniform_reference"],  # reference environment
+    ["uniform_red_strong"],  # intervention on R
+    ["uniform_green_strong"],  # intervention on G
+    ["uniform_blue_strong"],  # intervention on B
 ]
 
 variables = [

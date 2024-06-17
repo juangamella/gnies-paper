@@ -32,70 +32,148 @@
 
 CLUSTER_PATH="/cluster/scratch/gajuan/"
 
-# --------------------------------------------------------------------
-# Figure 1: Model match, standardized data.
+# # --------------------------------------------------------------------
+# # Figure 1: Model match, standardized data.
 
-DATASET=$CLUSTER_PATH"synthetic_experiments/dataset_1661334599_runs:10_seed:42_tag:I3s_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:noise_i_size:1_i_v_min:5_i_v_max:10_n:10,100,1000_obs:1_standardize:1/"
+# DATASET=$CLUSTER_PATH"synthetic_experiments/dataset_1661334599_runs:10_seed:42_tag:I3s_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:noise_i_size:1_i_v_min:5_i_v_max:10_n:10,100,1000_obs:1_standardize:1/"
+# # The dataset was generated using the command:
+# # python3 -m src.generate_synthetic_data --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type noise --obs --standardize --seed 42 --tag I3s
+
+# # Run the methods: GnIES, UT-IGSP, GES and sortnregress
+# bsub -n 50 -W 8:00 python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+# bsub -n 50 -W 2:00 python3 -m src.run_gnies --rank --phases f --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+# bsub -n 50 -W 2:00 python3 -m src.run_gnies --rank --phases b --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+# bsub -n 50 -W 0:30 python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory $DATASET
+# bsub -n 50 -W 0:30 python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+# bsub -n 50 -W 0:10 python3 -m src.run_sortnregress --n_workers 49 --pool --tag pool --directory $DATASET
+
+
+# # --------------------------------------------------------------------
+# # Figure 2: Model mismatch, standardized data.
+
+# DATASET=$CLUSTER_PATH"synthetic_experiments/dataset_1661334633_runs:10_seed:42_tag:I3sd_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:do_i_size:1_i_v_min:5_i_v_max:10_n:10,100,1000_obs:1_standardize:1/"
+# # The dataset was generated using the command:
+# # python3 -m src.generate_synthetic_data --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type do --obs --standardize --seed 42 --tag I3sd
+
+# # Run the methods: GnIES, UT-IGSP, GES, GIES and sortnregress
+# bsub -n 50 -W 8:00 python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+# bsub -n 50 -W 2:00 python3 -m src.run_gnies --rank --phases f --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+# bsub -n 50 -W 2:00 python3 -m src.run_gnies --rank --phases b --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+# bsub -n 50 -W 0:30 python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory $DATASET
+# bsub -n 50 -W 0:30 python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+# bsub -n 50 -W 0:30 python3 -m src.run_gies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+# bsub -n 50 -W 0:10 python3 -m src.run_sortnregress --n_workers 49 --pool --tag pool --directory $DATASET
+
+
+# # --------------------------------------------------------------------
+# # Figure 6 (Appendix D): Comparison with raw (unstandardized) data
+
+# # -----------
+# # Model match
+
+# DATASET=$CLUSTER_PATH"synthetic_experiments/dataset_1661334649_runs:10_seed:42_tag:I3_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:noise_i_size:1_i_v_min:5_i_v_max:10_n:10,100,1000_obs:1_standardize:0/"
+# # The dataset was generated using the command:
+# # python3 -m src.generate_synthetic_data --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type noise --obs --seed 42 --tag I3
+
+# # Run the methods: GnIES, UT-IGSP, GES and sortnregress
+# bsub -n 50 -W 8:00 python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+# bsub -n 50 -W 2:00 python3 -m src.run_gnies --rank --phases f --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+# bsub -n 50 -W 2:00 python3 -m src.run_gnies --rank --phases b --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+# bsub -n 50 -W 0:30 python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory $DATASET
+# bsub -n 50 -W 0:30 python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+# bsub -n 50 -W 0:10 python3 -m src.run_sortnregress --n_workers 49 --pool --tag pool --directory $DATASET
+
+# # --------------
+# # Model mismatch
+
+# DATASET=$CLUSTER_PATH"synthetic_experiments/dataset_1661334661_runs:10_seed:42_tag:I3d_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:do_i_size:1_i_v_min:5_i_v_max:10_n:10,100,1000_obs:1_standardize:0/"
+# # The dataset was generated using the command:
+# # python3 -m src.generate_synthetic_data --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type do --obs --seed 42 --tag I3d
+
+# # Run the methods: GnIES, UT-IGSP, GES, GIES and sortnregress
+# bsub -n 50 -W 8:00 python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+# bsub -n 50 -W 2:00 python3 -m src.run_gnies --rank --phases f --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+# bsub -n 50 -W 2:00 python3 -m src.run_gnies --rank --phases b --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+# bsub -n 50 -W 0:30 python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory $DATASET
+# bsub -n 50 -W 0:30 python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+# bsub -n 50 -W 0:30 python3 -m src.run_gies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
+# bsub -n 50 -W 0:10 python3 -m src.run_sortnregress --n_workers 49 --pool --tag pool --directory $DATASET
+
+
+# --------------------------------------------------------------------
+# Figure XXX: Different intervention strengths
+
+# --------------------------
+# Smaller change in variance, no means shift
+
+DATASET=$CLUSTER_PATH"synthetic_experiments/dataset_1718195408_runs:10_seed:42_tag:weak_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:noise_i_size:1_i_v_min:3.0_i_v_max:4.0_n:10,100,1000_obs:1_standardize:1/"
 # The dataset was generated using the command:
-# python3 -m src.generate_synthetic_data --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type noise --obs --standardize --seed 42 --tag I3s
+# python3 -m src.generate_synthetic_data --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type noise --obs --standardize --seed 42 --tag weak --i_v_min 3 --i_v_max 4
 
 # Run the methods: GnIES, UT-IGSP, GES and sortnregress
-bsub -n 50 -W 8:00 python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
-bsub -n 50 -W 2:00 python3 -m src.run_gnies --rank --phases f --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
-bsub -n 50 -W 2:00 python3 -m src.run_gnies --rank --phases b --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
-bsub -n 50 -W 0:30 python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory $DATASET
-bsub -n 50 -W 0:30 python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
-bsub -n 50 -W 0:10 python3 -m src.run_sortnregress --n_workers 49 --pool --tag pool --directory $DATASET
+sbatch --ntasks=50 --time=8:00:00 --wrap='python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=2:00:00 --wrap='python3 -m src.run_gnies --rank --phases f --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=2:00:00 --wrap='python3 -m src.run_gnies --rank --phases b --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=0:30:00 --wrap='python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=0:30:00 --wrap='python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=0:10:00 --wrap='python3 -m src.run_sortnregress --n_workers 49 --pool --tag pool --directory "'$DATASET'"'
 
+# --------------------------
+# Reduction in variance, no means shift
 
-# --------------------------------------------------------------------
-# Figure 2: Model mismatch, standardized data.
-
-DATASET=$CLUSTER_PATH"synthetic_experiments/dataset_1661334633_runs:10_seed:42_tag:I3sd_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:do_i_size:1_i_v_min:5_i_v_max:10_n:10,100,1000_obs:1_standardize:1/"
+DATASET=$CLUSTER_PATH"synthetic_experiments/dataset_1718195820_runs:10_seed:42_tag:small_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:noise_i_size:1_i_v_min:0.1_i_v_max:0.2_n:10,100,1000_obs:1_standardize:1/"
 # The dataset was generated using the command:
-# python3 -m src.generate_synthetic_data --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type do --obs --standardize --seed 42 --tag I3sd
-
-# Run the methods: GnIES, UT-IGSP, GES, GIES and sortnregress
-bsub -n 50 -W 8:00 python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
-bsub -n 50 -W 2:00 python3 -m src.run_gnies --rank --phases f --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
-bsub -n 50 -W 2:00 python3 -m src.run_gnies --rank --phases b --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
-bsub -n 50 -W 0:30 python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory $DATASET
-bsub -n 50 -W 0:30 python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
-bsub -n 50 -W 0:30 python3 -m src.run_gies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
-bsub -n 50 -W 0:10 python3 -m src.run_sortnregress --n_workers 49 --pool --tag pool --directory $DATASET
-
-
-# --------------------------------------------------------------------
-# Figure 6 (Appendix D): Comparison with raw (unstandardized) data
-
-# -----------
-# Model match
-
-DATASET=$CLUSTER_PATH"synthetic_experiments/dataset_1661334649_runs:10_seed:42_tag:I3_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:noise_i_size:1_i_v_min:5_i_v_max:10_n:10,100,1000_obs:1_standardize:0/"
-# The dataset was generated using the command:
-# python3 -m src.generate_synthetic_data --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type noise --obs --seed 42 --tag I3
+# python3-m src.generate_synthetic_data --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type noise --obs --standardize --seed 42 --tag small --i_v_min 0.1 --i_v_max 0.2
 
 # Run the methods: GnIES, UT-IGSP, GES and sortnregress
-bsub -n 50 -W 8:00 python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
-bsub -n 50 -W 2:00 python3 -m src.run_gnies --rank --phases f --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
-bsub -n 50 -W 2:00 python3 -m src.run_gnies --rank --phases b --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
-bsub -n 50 -W 0:30 python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory $DATASET
-bsub -n 50 -W 0:30 python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
-bsub -n 50 -W 0:10 python3 -m src.run_sortnregress --n_workers 49 --pool --tag pool --directory $DATASET
+sbatch --ntasks=50 --time=8:00:00 --wrap='python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=2:00:00 --wrap='python3 -m src.run_gnies --rank --phases f --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=2:00:00 --wrap='python3 -m src.run_gnies --rank --phases b --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=0:30:00 --wrap='python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=0:30:00 --wrap='python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=0:10:00 --wrap='python3 -m src.run_sortnregress --n_workers 49 --pool --tag pool --directory "'$DATASET'"'
 
+# --------------------------
+# No change in variance, mean shift
 
-# --------------
-# Model mismatch
-
-DATASET=$CLUSTER_PATH"synthetic_experiments/dataset_1661334661_runs:10_seed:42_tag:I3d_G:100_k:2.7_p:10_w_min:0.5_w_max:1_v_min:1_v_max:2_envs:4_i_type:do_i_size:1_i_v_min:5_i_v_max:10_n:10,100,1000_obs:1_standardize:0/"
+DATASET=$CLUSTER_PATH"TODO"
 # The dataset was generated using the command:
-# python3 -m src.generate_synthetic_data --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type do --obs --seed 42 --tag I3d
+# python3-m src.generate_synthetic_data --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type noise --obs --standardize --seed 42 --tag om --i_v_min 0 --i_v_max 0 --i_m_min 3 --i_m_min 4
 
-# Run the methods: GnIES, UT-IGSP, GES, GIES and sortnregress
-bsub -n 50 -W 8:00 python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
-bsub -n 50 -W 2:00 python3 -m src.run_gnies --rank --phases f --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
-bsub -n 50 -W 2:00 python3 -m src.run_gnies --rank --phases b --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
-bsub -n 50 -W 0:30 python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory $DATASET
-bsub -n 50 -W 0:30 python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
-bsub -n 50 -W 0:30 python3 -m src.run_gies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory $DATASET
-bsub -n 50 -W 0:10 python3 -m src.run_sortnregress --n_workers 49 --pool --tag pool --directory $DATASET
+# Run the methods: GnIES, UT-IGSP, GES and sortnregress
+sbatch --ntasks=50 --time=8:00:00 --wrap='python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=2:00:00 --wrap='python3 -m src.run_gnies --rank --phases f --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=2:00:00 --wrap='python3 -m src.run_gnies --rank --phases b --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=0:30:00 --wrap='python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=0:30:00 --wrap='python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=0:10:00 --wrap='python3 -m src.run_sortnregress --n_workers 49 --pool --tag pool --directory "'$DATASET'"'
+
+# --------------------------
+# Small change in variance, means shift
+
+DATASET=$CLUSTER_PATH"TODO"
+# The dataset was generated using the command:
+# python3-m src.generate_synthetic_data --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type noise --obs --standardize --seed 42 --tag weakm --i_v_min 3 --i_v_max 4 --i_m_min 3 --i_m_min 4
+
+# Run the methods: GnIES, UT-IGSP, GES and sortnregress
+sbatch --ntasks=50 --time=8:00:00 --wrap='python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=2:00:00 --wrap='python3 -m src.run_gnies --rank --phases f --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=2:00:00 --wrap='python3 -m src.run_gnies --rank --phases b --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=0:30:00 --wrap='python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=0:30:00 --wrap='python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=0:10:00 --wrap='python3 -m src.run_sortnregress --n_workers 49 --pool --tag pool --directory "'$DATASET'"'
+
+# --------------------------
+# Reduction in variance, means shift
+
+DATASET=$CLUSTER_PATH"TODO"
+# The dataset was generated using the command:
+# python3-m src.generate_synthetic_data --G 100 --runs 10 --n 10,100,1000 --i_size 1 --e 4 --p 10 --i_type noise --obs --standardize --seed 42 --tag smallm --i_v_min 0.1 --i_v_max 0.2 --i_m_min 3 --i_m_min 4
+
+# Run the methods: GnIES, UT-IGSP, GES and sortnregress
+sbatch --ntasks=50 --time=8:00:00 --wrap='python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=2:00:00 --wrap='python3 -m src.run_gnies --rank --phases f --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=2:00:00 --wrap='python3 -m src.run_gnies --rank --phases b --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=0:30:00 --wrap='python3 -m src.run_utigsp --n_workers 49 --alpha_lo 0.00001 --alpha_hi 0.1 --n_alphas 5 --beta_lo 0.00001 --beta_hi 0.1 --n_betas 5 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=0:30:00 --wrap='python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=0:10:00 --wrap='python3 -m src.run_sortnregress --n_workers 49 --pool --tag pool --directory "'$DATASET'"'
