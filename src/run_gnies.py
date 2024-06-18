@@ -186,7 +186,7 @@ gnies_options = {
     "approach": approach,
     "phases": gnies_phases,
     "direction": direction,
-    "center": args.fit_means,
+    "center": not args.fit_means,
     "ges_iterate": not args.ges_one_run,
     "ges_phases": ges_phases,
     "debug": args.gnies_verbose,
