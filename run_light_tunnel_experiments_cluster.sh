@@ -47,7 +47,7 @@ DATASET=$CLUSTER_PATH"light_tunnel_experiments/dataset_1718986239_light_tunnel_t
 # Run GnIES, GES
 sbatch --ntasks=50 --time=2:00:00 --wrap='python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'" --fit_means --gnies_verbose'
 sbatch --ntasks=50 --time=2:00:00 --wrap='python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'" --gnies_verbose'
-sbatch --ntasks=50 --time=0:30:00 --wrap='python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --n_workers 49 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=0:10:00 --wrap='python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --n_workers 49 --directory "'$DATASET'"'
 
 # Run UT-IGSP with Gaussian tests
 sbatch --ntasks=50 --time=0:10:00 --wrap='python3 -m src.run_utigsp --n_workers 49 --obs 0 --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-20" --directory "'$DATASET'" --debug'
@@ -68,7 +68,7 @@ DATASET=$CLUSTER_PATH"light_tunnel_experiments/dataset_1718986276_light_tunnel_t
 # Run GnIES, GES
 sbatch --ntasks=50 --time=2:00:00 --wrap='python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'" --fit_means --gnies_verbose'
 sbatch --ntasks=50 --time=2:00:00 --wrap='python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'" --gnies_verbose'
-sbatch --ntasks=50 --time=0:30:00 --wrap='python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --n_workers 49 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=0:10:00 --wrap='python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --n_workers 49 --directory "'$DATASET'"'
 
 # Run UT-IGSP with Gaussian tests
 sbatch --ntasks=50 --time=0:10:00 --wrap='python3 -m src.run_utigsp --n_workers 49 --obs 0 --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-20" --directory "'$DATASET'" --debug'
@@ -87,7 +87,7 @@ DATASET=$CLUSTER_PATH"light_tunnel_experiments/dataset_1718986313_light_tunnel_t
 # Run GnIES, GES
 sbatch --ntasks=50 --time=2:00:00 --wrap='python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'" --fit_means --gnies_verbose'
 sbatch --ntasks=50 --time=2:00:00 --wrap='python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'" --gnies_verbose'
-sbatch --ntasks=50 --time=0:30:00 --wrap='python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --n_workers 49 --directory "'$DATASET'"'
+sbatch --ntasks=50 --time=0:10:00 --wrap='python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --n_workers 49 --directory "'$DATASET'"'
 
 # Run UT-IGSP with Gaussian tests
 sbatch --ntasks=50 --time=0:10:00 --wrap='python3 -m src.run_utigsp --n_workers 49 --obs 0 --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-20" --directory "'$DATASET'" --debug'
