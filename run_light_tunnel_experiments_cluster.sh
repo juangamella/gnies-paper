@@ -66,8 +66,8 @@ sbatch --ntasks=50 --time=24:00:00 --wrap='python3 -m src.run_utigsp --n_workers
 DATASET=$CLUSTER_PATH"light_tunnel_experiments/dataset_1718986276_light_tunnel_tag:pols/"
 
 # Run GnIES, GES
-sbatch --ntasks=50 --time=2:00:00 --wrap='python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'" --fit_means --gnies_verbose'
-sbatch --ntasks=50 --time=2:00:00 --wrap='python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'" --gnies_verbose'
+sbatch --ntasks=50 --time=8:00:00 --wrap='python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'" --fit_means --gnies_verbose'
+sbatch --ntasks=50 --time=8:00:00 --wrap='python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'" --gnies_verbose'
 sbatch --ntasks=50 --time=0:10:00 --wrap='python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --n_workers 49 --directory "'$DATASET'"'
 
 # Run UT-IGSP with Gaussian tests
@@ -85,8 +85,8 @@ sbatch --ntasks=50 --time=24:00:00 --wrap='python3 -m src.run_utigsp --n_workers
 DATASET=$CLUSTER_PATH"light_tunnel_experiments/dataset_1718986313_light_tunnel_tag:angles/"
 
 # Run GnIES, GES
-sbatch --ntasks=50 --time=2:00:00 --wrap='python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'" --fit_means --gnies_verbose'
-sbatch --ntasks=50 --time=2:00:00 --wrap='python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'" --gnies_verbose'
+sbatch --ntasks=50 --time=8:00:00 --wrap='python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'" --fit_means --gnies_verbose'
+sbatch --ntasks=50 --time=8:00:00 --wrap='python3 -m src.run_gnies --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --directory "'$DATASET'" --gnies_verbose'
 sbatch --ntasks=50 --time=0:10:00 --wrap='python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --n_workers 49 --directory "'$DATASET'"'
 
 # Run UT-IGSP with Gaussian tests
