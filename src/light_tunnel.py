@@ -45,40 +45,51 @@ import time
 
 # Mapping from experiments -> environments
 
-# rgb
-environments = [
-    ["uniform_reference"],  # reference environment
-    ["uniform_red_mid", "uniform_red_strong"],  # intervention on R
-    ["uniform_green_mid", "uniform_green_strong"],  # intervention on G
-    ["uniform_blue_mid", "uniform_blue_strong"],  # intervention on B
-]
+# # rgb
+# environments = [
+#     ["uniform_reference"],  # reference environment
+#     ["uniform_red_mid", "uniform_red_strong"],  # intervention on R
+#     ["uniform_green_mid", "uniform_green_strong"],  # intervention on G
+#     ["uniform_blue_mid", "uniform_blue_strong"],  # intervention on B
+# ]
 
 
-# rgb1
-environments = [
-    ["uniform_reference"],  # reference environment
-    ["uniform_red_mid", "uniform_red_strong"],  # intervention on R
-    ["uniform_green_mid", "uniform_green_strong"],  # intervention on G
-    ["uniform_blue_mid", "uniform_blue_strong"],  # intervention on B
-    ["uniform_pol_1_mid", "uniform_pol_1_strong"],  # intervention on \theta_1
-]
+# # rgb1
+# environments = [
+#     ["uniform_reference"],  # reference environment
+#     ["uniform_red_mid", "uniform_red_strong"],  # intervention on R
+#     ["uniform_green_mid", "uniform_green_strong"],  # intervention on G
+#     ["uniform_blue_mid", "uniform_blue_strong"],  # intervention on B
+#     ["uniform_pol_1_mid", "uniform_pol_1_strong"],  # intervention on \theta_1
+# ]
 
-# rgb1_means
-environments = [
-    ["uniform_reference"],  # reference environment
-    ["uniform_red_strong"],  # intervention on R
-    ["uniform_green_strong"],  # intervention on G
-    ["uniform_blue_strong"],  # intervention on B
-    ["uniform_pol_1_strong"],  # intervention on \theta_1
-]
+# # rgb1_means
+# environments = [
+#     ["uniform_reference"],  # reference environment
+#     ["uniform_red_strong"],  # intervention on R
+#     ["uniform_green_strong"],  # intervention on G
+#     ["uniform_blue_strong"],  # intervention on B
+#     ["uniform_pol_1_strong"],  # intervention on \theta_1
+# ]
 
-# rgb_means
-environments = [
-    ["uniform_reference"],  # reference environment
-    ["uniform_red_strong"],  # intervention on R
-    ["uniform_green_strong"],  # intervention on G
-    ["uniform_blue_strong"],  # intervention on B
-]
+# # rgb_means
+# environments = [
+#     ["uniform_reference"],  # reference environment
+#     ["uniform_red_strong"],  # intervention on R
+#     ["uniform_green_strong"],  # intervention on G
+#     ["uniform_blue_strong"],  # intervention on B
+# ]
+
+environments = {
+    "ref": ["uniform_reference"],  # reference environment
+    "red": ["uniform_red_strong"],  # intervention on R
+    "green": ["uniform_green_strong"],  # intervention on G
+    "blue": ["uniform_blue_strong"],  # intervention on B
+    "pol_1": ["uniform_pol_1_strong"],  # intervention on \theta_1
+    "pol_2": ["uniform_pol_1_strong"],  # intervention on \theta_2
+    "angle_1": ["uniform_v_angle_1_mid"],  # intervention on \tilde{\theta}_1
+    "angle_2": ["uniform_v_angle_2_mid"],  # intervention on \tilde{\theta}_2
+}
 
 variables = [
     "red",
@@ -95,7 +106,7 @@ variables = [
 ]
 
 
-def load_dataset():
+def load_dataset(env_keys):
     # Download dataset
     dataset = causalchamber.datasets.Dataset(
         "lt_interventions_standard_v1", root="/tmp"
@@ -103,15 +114,18 @@ def load_dataset():
     # Select and merge experiments into environments (defined above)
     dataframes = [
         pd.concat(
-            [dataset.get_experiment(f).as_pandas_dataframe() for f in F],
+            [
+                dataset.get_experiment(f).as_pandas_dataframe()
+                for f in environments[key]
+            ],
             ignore_index=True,
         )
-        for F in environments
+        for key in env_keys
     ]
     return dataframes
 
 
-def prepare_experiments_directory(path, Ns, runs):
+def prepare_experiments_directory(path, Ns, env_keys, runs, tag=None):
     # Load ground-truth graph
     graph = (
         causalchamber.ground_truth.graph("lt", "standard")
@@ -132,7 +146,8 @@ def prepare_experiments_directory(path, Ns, runs):
     }
     # Write test case info
     path += "" if path[-1] == "/" else "/"
-    directory = path + "dataset_%d_light_tunnel/" % time.time()
+    directory = path + "dataset_%d_light_tunnel" % time.time()
+    directory += "/" if tag is None else "_tag:%s/" % tag
     os.makedirs(directory)
     filename = directory + utils.INFO_FILENAME
     utils.write_pickle(filename, to_save)
@@ -142,7 +157,7 @@ def prepare_experiments_directory(path, Ns, runs):
     utils.data_to_bin(graph, filename, debug=True)
     print('  saved graph to "%s"' % filename)
     # Write data
-    dataframes = load_dataset()
+    dataframes = load_dataset(env_keys)
     for n in Ns:
         for r in np.arange(runs):
             data = [

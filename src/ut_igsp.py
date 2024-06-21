@@ -28,7 +28,12 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from causaldag.utils.ci_tests import gauss_ci_suffstat, gauss_ci_test, hsic_test, MemoizedCI_Tester
+from causaldag.utils.ci_tests import (
+    gauss_ci_suffstat,
+    gauss_ci_test,
+    hsic_test,
+    MemoizedCI_Tester,
+)
 from causaldag.utils.invariance_tests import (
     gauss_invariance_suffstat,
     gauss_invariance_test,
@@ -54,23 +59,31 @@ def fit(data, alpha_ci, alpha_inv, debug=0, completion="gnies", test="hsic", obs
     if test == "gauss":
         # Form sufficient statistics
         ci_suffstat = gauss_ci_suffstat(observational_sample)
-        invariance_suffstat = gauss_invariance_suffstat(observational_sample, interventional_samples)
+        invariance_suffstat = gauss_invariance_suffstat(
+            observational_sample, interventional_samples
+        )
         # Create conditional independence tester and invariance tester
         ci_tester = MemoizedCI_Tester(gauss_ci_test, ci_suffstat, alpha=alpha_ci)
-        invariance_tester = MemoizedInvarianceTester(gauss_invariance_test, invariance_suffstat, alpha=alpha_inv)
+        invariance_tester = MemoizedInvarianceTester(
+            gauss_invariance_test, invariance_suffstat, alpha=alpha_inv
+        )
     elif test == "hsic":
         ci_tester = MemoizedCI_Tester(hsic_test, observational_sample, alpha=alpha_ci)
         suffstat = dict((i, sample) for i, sample in enumerate(interventional_samples))
         suffstat["obs_samples"] = observational_sample
-        invariance_tester = MemoizedInvarianceTester(hsic_invariance_test, suffstat, alpha=alpha_inv)
+        invariance_tester = MemoizedInvarianceTester(
+            hsic_invariance_test, suffstat, alpha=alpha_inv
+        )
     else:
         raise ValueError('Invalid value "%s" for field "test"' % test)
     # Run UT-IGSP
     setting_list = [dict(known_interventions=[])] * (len(data) - 1)
-    estimated_dag, est_targets_list = unknown_target_igsp(setting_list, nodes, ci_tester, invariance_tester)
+    estimated_dag, est_targets_list = unknown_target_igsp(
+        setting_list, nodes, ci_tester, invariance_tester
+    )
     # Process estimates
     estimated_dag = estimated_dag.to_amat()[0]
-    estimated_I = set.union(*est_targets_list)
+    estimated_I = set.union(*est_targets_list) if est_targets_list != [] else set()
     if completion == "gnies":
         # Compute equivalence class using nI-equivalence (Gamella et. al 2022)
         estimated_icpdag = utils.dag_to_icpdag(estimated_dag, estimated_I)
