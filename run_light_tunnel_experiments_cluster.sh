@@ -50,10 +50,10 @@ sbatch --ntasks=50 --time=2:00:00 --wrap='python3 -m src.run_gnies --n_workers 4
 sbatch --ntasks=50 --time=0:10:00 --wrap='python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --n_workers 49 --directory "'$DATASET'"'
 
 # Run UT-IGSP with Gaussian tests
-sbatch --ntasks=50 --time=0:10:00 --wrap='python3 -m src.run_utigsp --n_workers 49 --obs 0 --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-20" --directory "'$DATASET'" --debug'
+sbatch --ntasks=50 --time=0:10:00 --wrap='python3 -m src.run_utigsp --n_workers 49 --obs 0 --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-1,1e-2,1e-3,1e-10" --directory "'$DATASET'" --debug'
 
 # Run UT-IGSP with Kernel tests
-sbatch --ntasks=50 --time=24:00:00 --wrap='python3 -m src.run_utigsp --n_workers 8 --obs 0 --test hsic --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-20" --directory "'$DATASET'" --debug'
+sbatch --ntasks=50 --time=24:00:00 --wrap='python3 -m src.run_utigsp --n_workers 8 --obs 0 --test hsic --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-1,1e-2,1e-3,1e-10" --directory "'$DATASET'" --debug'
 
 # ./compute_metrics.sh $DATASET
 
@@ -71,10 +71,10 @@ sbatch --ntasks=50 --time=8:00:00 --wrap='python3 -m src.run_gnies --n_workers 4
 sbatch --ntasks=50 --time=0:10:00 --wrap='python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --n_workers 49 --directory "'$DATASET'"'
 
 # Run UT-IGSP with Gaussian tests
-sbatch --ntasks=50 --time=0:10:00 --wrap='python3 -m src.run_utigsp --n_workers 49 --obs 0 --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-20" --directory "'$DATASET'" --debug'
+sbatch --ntasks=50 --time=0:10:00 --wrap='python3 -m src.run_utigsp --n_workers 49 --obs 0 --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-1,1e-2,1e-3,1e-10" --directory "'$DATASET'" --debug'
 
 # Run UT-IGSP with Kernel tests
-sbatch --ntasks=50 --time=24:00:00 --wrap='python3 -m src.run_utigsp --n_workers 8 --obs 0 --test hsic --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-20" --directory "'$DATASET'" --debug'
+sbatch --ntasks=50 --time=24:00:00 --wrap='python3 -m src.run_utigsp --n_workers 8 --obs 0 --test hsic --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-1,1e-2,1e-3,1e-10" --directory "'$DATASET'" --debug'
 
 # ----------------------------------------------------------------------
 # Interventions on angle_1 and angle_2
@@ -90,9 +90,9 @@ sbatch --ntasks=50 --time=8:00:00 --wrap='python3 -m src.run_gnies --n_workers 4
 sbatch --ntasks=50 --time=0:10:00 --wrap='python3 -m src.run_ges --n_workers 49 --lambdas 0.01,0.25,0.5,0.75,1,2 --n_workers 49 --directory "'$DATASET'"'
 
 # Run UT-IGSP with Gaussian tests
-sbatch --ntasks=50 --time=0:10:00 --wrap='python3 -m src.run_utigsp --n_workers 49 --obs 0 --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-20" --directory "'$DATASET'" --debug'
+sbatch --ntasks=50 --time=0:10:00 --wrap='python3 -m src.run_utigsp --n_workers 49 --obs 0 --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-1,1e-2,1e-3,1e-10" --directory "'$DATASET'" --debug'
 
 # Run UT-IGSP with Kernel tests
-sbatch --ntasks=50 --time=24:00:00 --wrap='python3 -m src.run_utigsp --n_workers 8 --obs 0 --test hsic --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-20" --directory "'$DATASET'" --debug'
+sbatch --ntasks=50 --time=24:00:00 --wrap='python3 -m src.run_utigsp --n_workers 8 --obs 0 --test hsic --alphas "1e-1,1e-2,1e-3,2e-1,3e-1,4e-1,5e-1,5e-2" --betas "1e-1,1e-2,1e-3,1e-10" --directory "'$DATASET'" --debug'
 
 
